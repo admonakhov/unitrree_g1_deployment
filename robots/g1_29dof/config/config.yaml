@@ -67,14 +67,14 @@ FSM:
       Mimic_Gangnam_Style: LT(2s) + left.on_pressed
 
     # policy_dir: config/policy/velocity
-    policy_dir: ../../../policy/g1_29/velocity
+    policy_dir: /home/unitree/deploy/policy/g1_29/velocity
   Mimic_Dance_102:
     transitions: 
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
     fps: 30
-    motion_file: ../../../policy/g1_29/mocap/OPT_take_008_katya.csv
-    policy_dir: ../../../policy/g1_29/mimic/
+    motion_file: /home/unitree/deploy/policy/g1_29/mocap/OPT_take_008_katya.csv
+    policy_dir: /home/unitree/deploy/policy/g1_29/g1_29/mimic/
     time_start: 0
     time_end: 240
   Mimic_Gangnam_Style:
