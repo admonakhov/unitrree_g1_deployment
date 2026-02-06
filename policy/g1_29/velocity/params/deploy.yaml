@@ -15,7 +15,7 @@ commands:
       lin_vel_x: [-0.5, 1.0]
       lin_vel_y: [-0.3, 0.3]
       ang_vel_z: [-0.2, 0.2]
-      heading: null
+      heading: !!python/tuple [-3.14, 3.14]
 actions:
   JointPositionAction:
     clip: null

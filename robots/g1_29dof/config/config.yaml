@@ -65,8 +65,6 @@ FSM:
       Passive: LT + B.on_pressed
       Mimic_Dance_102: LT(2s) + down.on_pressed
       Mimic_Gangnam_Style: LT(2s) + left.on_pressed
-
-    # policy_dir: config/policy/velocity
     policy_dir: /home/unitree/deploy/policy/g1_29/velocity
   Mimic_Dance_102:
     transitions: 
