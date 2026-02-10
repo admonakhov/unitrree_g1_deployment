@@ -1,0 +1,75 @@
+FSM:
+  _: # enabled fsms
+    Passive:
+      id: 1
+    FixStand:
+      id: 2
+    Velocity:
+      id: 3
+      type: RLBase
+
+    # Mimic_Dance_102: # uncomment to enable
+    #   id: 101
+    #   type: Mimic
+
+  Passive:
+    transitions: 
+      FixStand: LT + up.on_pressed
+    mode: [
+      1,1,1,1,1,1,
+      1,1,1,1,1,1,
+      1,0,0,
+      1,1,1,1,1,0,0,
+      1,1,1,1,1,0,0,
+    ]
+    kd: [
+      3,3,3,3,3,3,
+      3,3,3,3,3,3,
+      3,0,0,
+      3,3,3,3,3,0,0,  
+      3,3,3,3,3,0,0,  
+    ]
+  FixStand:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    kp: [
+      100., 100., 100., 150., 40., 40.,
+      100., 100., 100., 150., 40., 40.,
+      200,0,0,
+      40,40,40,40,40,0,0,
+      40,40,40,40,40,0,0,
+    ]
+    kd: [
+      2,2,2,4,2,2,
+      2,2,2,4,2,2,
+      5,0,0,
+      10,10,10,10,10,0,0,
+      10,10,10,10,10,0,0,
+    ]
+    ts: [0, 3]
+    qs: [
+      [],
+      [ -0.1, 0,0,0.3,-0.2,0,
+        -0.1, 0,0,0.3,-0.2,0,
+        0,0,0,
+        0, 0.25,0,0.97,0.15, 0,0,
+        0, -0.25,0,0.97,-0.15, 0,0
+      ]
+    ]
+  Velocity:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Mimic_Dance_102: LT(2s) + down.on_pressed
+    policy_dir: /home/unitree/unitrree_g1_deployment/policy/arcus/velocity
+
+  Mimic_Dance_102:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 60
+    motion_file: /home/ant/UniTree/gym/retargeting/mocap/walking_60fps.csv
+    # motion_file: cnfig/policy/mimic/gangnam_style/params/G1_gangnam_style_V01.bvh_60hz.csv
+    policy_dir: /home/ant/UniTree/gym/unitree_rl_lab/logs/rsl_rl/unitree_arcus_a1_v0_mimic
+    time_start: 0
+    time_end: 60.0

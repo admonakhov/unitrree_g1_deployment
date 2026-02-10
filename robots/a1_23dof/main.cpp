@@ -2,6 +2,7 @@
 #include "FSM/State_Passive.h"
 #include "FSM/State_FixStand.h"
 #include "FSM/State_RLBase.h"
+#include "State_Mimic.h"
 
 std::unique_ptr<LowCmd_t> FSMState::lowcmd = nullptr;
 std::shared_ptr<LowState_t> FSMState::lowstate = nullptr;
@@ -30,7 +31,7 @@ int main(int argc, char** argv)
     auto vm = param::helper(argc, argv);
 
     std::cout << " --- Unitree Robotics --- \n";
-    std::cout << "     G1-23dof Controller \n";
+    std::cout << "     Arcus1-23dof Controller \n";
 
     // Unitree DDS Config
     unitree::robot::ChannelFactory::Instance()->Init(0, vm["network"].as<std::string>());
