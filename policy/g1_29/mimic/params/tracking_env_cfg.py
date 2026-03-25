@@ -88,8 +88,10 @@ class CommandsCfg:
         asset_name="robot",
         # generate npz file before training
         # python python scripts/mimic/csv_to_npz.py -f path/to/G1_Take_102.bvh_60hz.csv --input_fps 60
-        motion_file='/home/ant/UniTree/gym/retargeting/mocap/g1_29/OPT/OPT_take_008_katya.npz',
+        motion_file=["mocap/g1/sword/OPT_Sword_005_Alan_01.npz"],
         anchor_body_name="torso_link",
+        # adaptive_alpha = 0.000,
+        # adaptive_uniform_ratio = 1,
         resampling_time_range=(1.0e9, 1.0e9),
         debug_vis=True,
         pose_range={
@@ -187,15 +189,15 @@ class EventCfg:
         },
     )
 
-    add_joint_default_pos = EventTerm(
-        func=mdp.randomize_joint_default_pos,
-        mode="startup",
-        params={
-            "asset_cfg": SceneEntityCfg("robot", joint_names=[".*"]),
-            "pos_distribution_params": (-0.01, 0.01),
-            "operation": "add",
-        },
-    )
+    # add_joint_default_pos = EventTerm(
+    #     func=mdp.randomize_joint_default_pos,
+    #     mode="startup",
+    #     params={
+    #         "asset_cfg": SceneEntityCfg("robot", joint_names=[".*"]),
+    #         "pos_distribution_params": (-0.01, 0.01),
+    #         "operation": "add",
+    #     },
+    # )
 
     base_com = EventTerm(
         func=mdp.randomize_rigid_body_com,
