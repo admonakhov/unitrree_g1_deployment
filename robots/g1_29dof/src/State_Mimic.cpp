@@ -362,15 +362,24 @@ void State_Mimic::start_audio_if_configured()
     audio_stream_id_ = stream_id;
     const auto pcm = std::make_shared<std::vector<uint8_t>>(wav.pcm);
 
-    audio_thread_ = std::thread([this, pcm, stream_id]{
+    audio_thread_ = std::thread([this, pcm, stream_id, wav]{
         constexpr size_t kChunkSize = 96000; // ~3 seconds at 16kHz mono 16-bit
+        const size_t bytes_per_sec =
+            static_cast<size_t>(wav.sample_rate) *
+            static_cast<size_t>(wav.num_channels) *
+            static_cast<size_t>(wav.bits_per_sample / 8);
         size_t offset = 0;
         while (offset < pcm->size() && audio_thread_running.load()) {
             size_t remaining = pcm->size() - offset;
             size_t current_size = std::min(kChunkSize, remaining);
             std::vector<uint8_t> chunk(pcm->begin() + offset, pcm->begin() + offset + current_size);
             audio_client_->PlayStream("mimic", stream_id, chunk);
-            unitree::common::Sleep(1);
+            if (bytes_per_sec > 0) {
+                const float chunk_sec = static_cast<float>(current_size) / static_cast<float>(bytes_per_sec);
+                unitree::common::Sleep(chunk_sec);
+            } else {
+                unitree::common::Sleep(1);
+            }
             offset += current_size;
         }
         audio_client_->PlayStop(stream_id);
