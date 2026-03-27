@@ -41,7 +41,7 @@ public:
                 auto ast = p.Parse();
                 auto func = unitree::common::dsl::Compile(*ast);
                 auto wrapped = [func, condition, fsm_id, state_string]()->bool{
-                    bool res = func(FSMState::lowstate->joystick);
+                    bool res = func(FSMState::active_joystick());
                     if (res) {
                         spdlog::info("FSM: Condition '{}' triggered in State_{} -> State_{}",
                                      condition,
@@ -68,6 +68,14 @@ public:
         );
     }
 
+    static const unitree::common::UnitreeJoystick & active_joystick()
+    {
+        if (gamepad && gamepad->connected()) {
+            return gamepad->joystick();
+        }
+        return lowstate->joystick;
+    }
+
     void pre_run()
     {
         lowstate->update();
@@ -86,7 +94,7 @@ public:
             auto now = std::chrono::steady_clock::now();
             if (now - last_log > std::chrono::milliseconds(500)) {
                 last_log = now;
-                const auto & j = lowstate->joystick;
+                const auto & j = active_joystick();
                 spdlog::info("Velocity input: LT pressed={} t={:.2f}, down pressed={} on_pressed={}",
                              j.LT.pressed, j.LT.pressed_time, j.down.pressed, j.down.on_pressed);
             }
