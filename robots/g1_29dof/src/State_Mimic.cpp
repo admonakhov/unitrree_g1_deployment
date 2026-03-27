@@ -46,6 +46,7 @@ static uint16_t read_u16_le(std::ifstream & in)
 static WavData read_wav_file(const std::filesystem::path & path)
 {
     WavData out;
+    spdlog::info("Loading audio file: {}", path.string());
     std::ifstream in(path, std::ios::binary);
     if (!in) {
         spdlog::warn("Audio file not found: {}", path.string());
@@ -104,6 +105,11 @@ static WavData read_wav_file(const std::filesystem::path & path)
         spdlog::warn("Unsupported WAV format (need PCM): {}", path.string());
         return out;
     }
+    spdlog::info("Audio WAV: {} Hz, {} ch, {} bit, {} bytes",
+                 out.sample_rate,
+                 static_cast<int>(out.num_channels),
+                 static_cast<int>(out.bits_per_sample),
+                 out.pcm.size());
     out.ok = true;
     return out;
 }
@@ -272,6 +278,7 @@ State_Mimic::State_Mimic(int state_mode, std::string state_string)
 
 void State_Mimic::enter()
 {
+    spdlog::info("Enter State_Mimic");
     // set gain
     for (int i = 0; i < env->robot->data.joint_stiffness.size(); ++i)
     {
@@ -326,9 +333,11 @@ void State_Mimic::run()
 void State_Mimic::start_audio_if_configured()
 {
     if (!audio_file_) {
+        spdlog::info("No audio_file configured for this Mimic action");
         return;
     }
     if (!audio_client_) {
+        spdlog::info("Initializing AudioClient");
         audio_client_ = std::make_unique<unitree::robot::g1::AudioClient>();
         audio_client_->Init();
         audio_client_->SetTimeout(10.0f);
@@ -336,6 +345,7 @@ void State_Mimic::start_audio_if_configured()
 
     const auto wav = read_wav_file(*audio_file_);
     if (!wav.ok) {
+        spdlog::warn("Audio load failed, continuing without audio");
         return;
     }
     if (wav.sample_rate != 16000 || wav.num_channels != 1 || wav.bits_per_sample != 16) {
@@ -343,6 +353,7 @@ void State_Mimic::start_audio_if_configured()
         return;
     }
 
+    spdlog::info("Starting audio playback for Mimic action");
     audio_thread_running = true;
     const std::string stream_id = std::to_string(unitree::common::GetCurrentTimeMillisecond());
     audio_stream_id_ = stream_id;
