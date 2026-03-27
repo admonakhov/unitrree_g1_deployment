@@ -81,7 +81,7 @@ FSM:
       Velocity: RB + X.on_pressed
     fps: 60
     motion_file: ../../policy/g1_29/mocap/motion2.csv
-    audio_file: ../../policy/g1_29/audio/2_2(1).wav
+    audio_file: ../../policy/g1_29/audio/2_2.wav
     volume: 100
     policy_dir: ../../policy/g1_29/mimic/
     time_start: 0
