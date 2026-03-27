@@ -75,7 +75,7 @@ FSM:
       Mimic_Action_3: LT(2s) + right.on_pressed\
     policy_dir: ../../policy/g1_29/velocity/
 
-    Mimic_Action_1:
+  Mimic_Action_1:
     transitions: 
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
