@@ -257,6 +257,13 @@ State_Mimic::State_Mimic(int state_mode, std::string state_string)
     } else {
         spdlog::info("Mimic audio_file not set");
     }
+    if (cfg["volume"]) {
+        int volume = cfg["volume"].as<int>();
+        volume = std::clamp(volume, 0, 100);
+        audio_volume_ = static_cast<uint8_t>(volume);
+    } else {
+        audio_volume_ = 100;
+    }
 
     env = std::make_unique<isaaclab::ManagerBasedRLEnv>(
         YAML::LoadFile(policy_dir / "params" / "deploy.yaml"),
@@ -335,15 +342,17 @@ void State_Mimic::run()
 
 void State_Mimic::start_audio_if_configured()
 {
-    if (!audio_file_) {
-        spdlog::info("No audio_file configured for this Mimic action");
-        return;
-    }
     if (!audio_client_) {
         spdlog::info("Initializing AudioClient");
         audio_client_ = std::make_unique<unitree::robot::g1::AudioClient>();
         audio_client_->Init();
         audio_client_->SetTimeout(10.0f);
+    }
+    audio_client_->SetVolume(audio_volume_);
+
+    if (!audio_file_) {
+        spdlog::info("No audio_file configured for this Mimic action");
+        return;
     }
 
     const auto wav = read_wav_file(*audio_file_);

@@ -46,6 +46,7 @@ private:
     std::thread audio_thread_;
     std::atomic<bool> audio_thread_running{false};
     std::string audio_stream_id_;
+    uint8_t audio_volume_{100};
 };
 
 class State_Mimic::MotionLoader_
