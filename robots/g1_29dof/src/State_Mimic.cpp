@@ -3,8 +3,112 @@
 #include "isaaclab/envs/mdp/observations/observations.h"
 #include "isaaclab/envs/mdp/actions/joint_actions.h"
 
+#include <algorithm>
+#include <cstdint>
+#include <cstring>
+#include <fstream>
+#include <vector>
+
+#include <spdlog/spdlog.h>
+#include <unitree/common/time/time_tool.hpp>
+#include <unitree/robot/g1/audio/g1_audio_client.hpp>
+
 static Eigen::Quaternionf init_quat;
 std::shared_ptr<State_Mimic::MotionLoader_> State_Mimic::motion = nullptr;
+
+namespace {
+
+struct WavData {
+    int32_t sample_rate = -1;
+    int16_t num_channels = 0;
+    int16_t bits_per_sample = 0;
+    std::vector<uint8_t> pcm;
+    bool ok = false;
+};
+
+static uint32_t read_u32_le(std::ifstream & in)
+{
+    uint8_t b[4]{};
+    in.read(reinterpret_cast<char*>(b), sizeof(b));
+    return static_cast<uint32_t>(b[0])
+         | (static_cast<uint32_t>(b[1]) << 8)
+         | (static_cast<uint32_t>(b[2]) << 16)
+         | (static_cast<uint32_t>(b[3]) << 24);
+}
+
+static uint16_t read_u16_le(std::ifstream & in)
+{
+    uint8_t b[2]{};
+    in.read(reinterpret_cast<char*>(b), sizeof(b));
+    return static_cast<uint16_t>(b[0]) | (static_cast<uint16_t>(b[1]) << 8);
+}
+
+static WavData read_wav_file(const std::filesystem::path & path)
+{
+    WavData out;
+    std::ifstream in(path, std::ios::binary);
+    if (!in) {
+        spdlog::warn("Audio file not found: {}", path.string());
+        return out;
+    }
+
+    char riff[4]{};
+    in.read(riff, 4);
+    if (std::strncmp(riff, "RIFF", 4) != 0) {
+        spdlog::warn("Audio file is not RIFF WAV: {}", path.string());
+        return out;
+    }
+    (void)read_u32_le(in); // file size
+    char wave[4]{};
+    in.read(wave, 4);
+    if (std::strncmp(wave, "WAVE", 4) != 0) {
+        spdlog::warn("Audio file is not WAVE: {}", path.string());
+        return out;
+    }
+
+    bool have_fmt = false;
+    bool have_data = false;
+    uint16_t audio_format = 0;
+    while (in && (!have_fmt || !have_data)) {
+        char chunk_id[4]{};
+        in.read(chunk_id, 4);
+        if (!in) {
+            break;
+        }
+        uint32_t chunk_size = read_u32_le(in);
+        if (std::strncmp(chunk_id, "fmt ", 4) == 0) {
+            audio_format = read_u16_le(in);
+            out.num_channels = static_cast<int16_t>(read_u16_le(in));
+            out.sample_rate = static_cast<int32_t>(read_u32_le(in));
+            (void)read_u32_le(in); // byte rate
+            (void)read_u16_le(in); // block align
+            out.bits_per_sample = static_cast<int16_t>(read_u16_le(in));
+            if (chunk_size > 16) {
+                in.seekg(chunk_size - 16, std::ios::cur);
+            }
+            have_fmt = true;
+        } else if (std::strncmp(chunk_id, "data", 4) == 0) {
+            out.pcm.resize(chunk_size);
+            in.read(reinterpret_cast<char*>(out.pcm.data()), chunk_size);
+            have_data = true;
+        } else {
+            in.seekg(chunk_size, std::ios::cur);
+        }
+    }
+
+    if (!have_fmt || !have_data) {
+        spdlog::warn("Audio file missing fmt/data chunks: {}", path.string());
+        return out;
+    }
+    if (audio_format != 1) {
+        spdlog::warn("Unsupported WAV format (need PCM): {}", path.string());
+        return out;
+    }
+    out.ok = true;
+    return out;
+}
+
+} // namespace
 
 Eigen::Quaternionf torso_quat_w(isaaclab::ManagerBasedRLEnv* env) {
     using G1Type = unitree::BaseArticulation<LowState_t::SharedPtr>;
@@ -137,6 +241,14 @@ State_Mimic::State_Mimic(int state_mode, std::string state_string)
         time_range_[1] = motion_->duration;
     }
 
+    if (cfg["audio_file"]) {
+        std::filesystem::path audio_path = cfg["audio_file"].as<std::string>();
+        if (!audio_path.is_absolute()) {
+            audio_path = param::proj_dir / audio_path;
+        }
+        audio_file_ = audio_path;
+    }
+
     env = std::make_unique<isaaclab::ManagerBasedRLEnv>(
         YAML::LoadFile(policy_dir / "params" / "deploy.yaml"),
         articulation
@@ -171,6 +283,7 @@ void State_Mimic::enter()
 
     motion = motion_; // set for specific motion
     env->reset();
+    start_audio_if_configured();
     // Start policy thread
     policy_thread_running = true;
     policy_thread = std::thread([this]{
@@ -207,5 +320,57 @@ void State_Mimic::run()
     auto action = env->action_manager->processed_actions();
     for(int i(0); i < env->robot->data.joint_ids_map.size(); i++) {
         lowcmd->msg_.motor_cmd()[env->robot->data.joint_ids_map[i]].q() = action[i];
+    }
+}
+
+void State_Mimic::start_audio_if_configured()
+{
+    if (!audio_file_) {
+        return;
+    }
+    if (!audio_client_) {
+        audio_client_ = std::make_unique<unitree::robot::g1::AudioClient>();
+        audio_client_->Init();
+        audio_client_->SetTimeout(10.0f);
+    }
+
+    const auto wav = read_wav_file(*audio_file_);
+    if (!wav.ok) {
+        return;
+    }
+    if (wav.sample_rate != 16000 || wav.num_channels != 1 || wav.bits_per_sample != 16) {
+        spdlog::warn("Audio file format error (need 16kHz/mono/16-bit): {}", audio_file_->string());
+        return;
+    }
+
+    audio_thread_running = true;
+    const std::string stream_id = std::to_string(unitree::common::GetCurrentTimeMillisecond());
+    audio_stream_id_ = stream_id;
+    const auto pcm = std::make_shared<std::vector<uint8_t>>(wav.pcm);
+
+    audio_thread_ = std::thread([this, pcm, stream_id]{
+        constexpr size_t kChunkSize = 96000; // ~3 seconds at 16kHz mono 16-bit
+        size_t offset = 0;
+        while (offset < pcm->size() && audio_thread_running.load()) {
+            size_t remaining = pcm->size() - offset;
+            size_t current_size = std::min(kChunkSize, remaining);
+            std::vector<uint8_t> chunk(pcm->begin() + offset, pcm->begin() + offset + current_size);
+            audio_client_->PlayStream("mimic", stream_id, chunk);
+            unitree::common::Sleep(1);
+            offset += current_size;
+        }
+        audio_client_->PlayStop(stream_id);
+    });
+}
+
+void State_Mimic::stop_audio()
+{
+    audio_thread_running = false;
+    if (audio_thread_.joinable()) {
+        audio_thread_.join();
+    }
+    if (audio_client_ && !audio_stream_id_.empty()) {
+        audio_client_->PlayStop(audio_stream_id_);
+        audio_stream_id_.clear();
     }
 }

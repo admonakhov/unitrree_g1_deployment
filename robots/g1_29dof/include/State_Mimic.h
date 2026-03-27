@@ -1,6 +1,16 @@
 #pragma once
 
+#include <atomic>
+#include <filesystem>
+#include <optional>
+#include <string>
+#include <thread>
+
 #include "FSM/State_RLBase.h"
+
+namespace unitree::robot::g1 {
+class AudioClient;
+}
 
 class State_Mimic : public FSMState
 {
@@ -13,6 +23,7 @@ public:
     
     void exit()
     {
+        stop_audio();
         policy_thread_running = false;
         if (policy_thread.joinable()) {
             policy_thread.join();
@@ -23,12 +34,21 @@ public:
 
     static std::shared_ptr<MotionLoader_> motion; // for obs computation
 private:
+    void start_audio_if_configured();
+    void stop_audio();
+
     std::unique_ptr<isaaclab::ManagerBasedRLEnv> env;
     std::shared_ptr<MotionLoader_> motion_; // for saving
 
     std::thread policy_thread;
     bool policy_thread_running = false;
     std::array<float, 2> time_range_;
+
+    std::optional<std::filesystem::path> audio_file_;
+    std::unique_ptr<unitree::robot::g1::AudioClient> audio_client_;
+    std::thread audio_thread_;
+    std::atomic<bool> audio_thread_running{false};
+    std::string audio_stream_id_;
 };
 
 class State_Mimic::MotionLoader_
