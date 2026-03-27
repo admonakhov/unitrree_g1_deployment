@@ -7,10 +7,7 @@
 #include <thread>
 
 #include "FSM/State_RLBase.h"
-
-namespace unitree::robot::g1 {
-class AudioClient;
-}
+#include <unitree/robot/g1/audio/g1_audio_client.hpp>
 
 class State_Mimic : public FSMState
 {
