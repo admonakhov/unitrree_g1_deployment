@@ -35,7 +35,33 @@ public:
 
     bool connected() const { return fd_ >= 0; }
 
-    unitree::common::UnitreeJoystick & joystick() { return joystick_; }
+    const unitree::common::UnitreeJoystick & joystick() const { return joystick_; }
+
+    void apply_to(unitree::common::UnitreeJoystick & dst) const
+    {
+        dst.back(joystick_.back());
+        dst.start(joystick_.start());
+        dst.LS(joystick_.LS());
+        dst.RS(joystick_.RS());
+        dst.LB(joystick_.LB());
+        dst.RB(joystick_.RB());
+        dst.A(joystick_.A());
+        dst.B(joystick_.B());
+        dst.X(joystick_.X());
+        dst.Y(joystick_.Y());
+        dst.up(joystick_.up());
+        dst.down(joystick_.down());
+        dst.left(joystick_.left());
+        dst.right(joystick_.right());
+        dst.F1(joystick_.F1());
+        dst.F2(joystick_.F2());
+        dst.lx(joystick_.lx());
+        dst.ly(joystick_.ly());
+        dst.rx(joystick_.rx());
+        dst.ry(joystick_.ry());
+        dst.LT(joystick_.LT());
+        dst.RT(joystick_.RT());
+    }
 
     void update()
     {

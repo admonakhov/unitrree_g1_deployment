@@ -63,7 +63,7 @@ public:
             gamepad->update();
             if (gamepad->connected()) {
                 std::lock_guard<std::mutex> lock(lowstate->mutex_);
-                lowstate->joystick = gamepad->joystick();
+                gamepad->apply_to(lowstate->joystick);
             }
         }
         if(keyboard) keyboard->update();
