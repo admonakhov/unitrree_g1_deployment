@@ -80,7 +80,7 @@ FSM:
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
     fps: 60
-    motion_file: ../../policy/g1_29/mocap/motion2.csv
+    # motion_file: ../../policy/g1_29/mocap/motion2.csv
     audio_file: ../../policy/g1_29/audio/sample.wav
     policy_dir: ../../policy/g1_29/mimic/
     time_start: 0
