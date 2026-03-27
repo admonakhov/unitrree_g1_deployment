@@ -253,6 +253,9 @@ State_Mimic::State_Mimic(int state_mode, std::string state_string)
             audio_path = param::proj_dir / audio_path;
         }
         audio_file_ = audio_path;
+        spdlog::info("Mimic audio_file set: {}", audio_path.string());
+    } else {
+        spdlog::info("Mimic audio_file not set");
     }
 
     env = std::make_unique<isaaclab::ManagerBasedRLEnv>(

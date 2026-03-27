@@ -72,7 +72,7 @@ FSM:
       Passive: LT + B.on_pressed
       Mimic_Action_1: LT(2s) + down.on_pressed
       Mimic_Action_2: LT(2s) + left.on_pressed
-      Mimic_Action_3: LT(2s) + right.on_pressed\
+      Mimic_Action_3: LT(2s) + right.on_pressed
     policy_dir: ../../policy/g1_29/velocity/
 
   Mimic_Action_1:
