@@ -85,32 +85,32 @@ FSM:
     time_start: 0
     time_end: 24.0
 
-  Mimic_Action_2:
-    transitions: 
-      Passive: LT + B.on_pressed
-      Velocity: RB + X.on_pressed
-    fps: 30
-    motion_file: ../../../mocap/motion1.csv
-    policy_dir: ../../../policy/g1_29/mimic/
-    time_start: 0
-    time_end: 24.0
+  # Mimic_Action_2:
+  #   transitions: 
+  #     Passive: LT + B.on_pressed
+  #     Velocity: RB + X.on_pressed
+  #   fps: 30
+  #   motion_file: ../../../mocap/motion1.csv
+  #   policy_dir: ../../../policy/g1_29/mimic/
+  #   time_start: 0
+  #   time_end: 24.0
 
-  Mimic_Action_3:
-    transitions: 
-      Passive: LT + B.on_pressed
-      Velocity: RB + X.on_pressed
-    fps: 30
-    motion_file: ../../../mocap/motion1.csv
-    policy_dir: ../../../policy/g1_29/mimic/
-    time_start: 0
-    time_end: 24.0
+  # Mimic_Action_3:
+  #   transitions: 
+  #     Passive: LT + B.on_pressed
+  #     Velocity: RB + X.on_pressed
+  #   fps: 30
+  #   motion_file: ../../../mocap/motion1.csv
+  #   policy_dir: ../../../policy/g1_29/mimic/
+  #   time_start: 0
+  #   time_end: 24.0
 
-  Mimic_Action_4:
-    transitions: 
-      Passive: LT + B.on_pressed
-      Velocity: RB + X.on_pressed
-    fps: 30
-    motion_file: ../../../mocap/motion1.csv
-    policy_dir: ../../../policy/g1_29/mimic/
-    time_start: 0
-    time_end: 24.0
+  # Mimic_Action_4:
+  #   transitions: 
+  #     Passive: LT + B.on_pressed
+  #     Velocity: RB + X.on_pressed
+  #   fps: 30
+  #   motion_file: ../../../mocap/motion1.csv
+  #   policy_dir: ../../../policy/g1_29/mimic/
+  #   time_start: 0
+  #   time_end: 24.0
