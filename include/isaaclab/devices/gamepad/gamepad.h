@@ -37,7 +37,7 @@ public:
 
     const unitree::common::UnitreeJoystick & joystick() const { return joystick_; }
 
-    void apply_to(unitree::common::UnitreeJoystick & dst) const
+    void apply_to(unitree::common::UnitreeJoystick & dst)
     {
         dst.back(joystick_.back());
         dst.start(joystick_.start());
