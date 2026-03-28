@@ -1,0 +1,129 @@
+Simulation:
+  enabled: false
+  play_audio: true
+
+FSM:
+  _: # enabled fsms
+    Passive:
+      id: 1
+    FixStand:
+      id: 2
+    Velocity:
+      id: 3
+      type: RLBase
+
+    Mimic_Action_1: # uncomment to enable
+      id: 101
+      type: Mimic
+    Mimic_Action_2:
+      id: 102
+      type: Mimic
+    Mimic_Action_3:
+      id: 103
+      type: Mimic
+    Mimic_Action_4:
+      id: 104
+      type: Mimic
+
+  Passive:
+    transitions: 
+      FixStand: LT + up.on_pressed
+    mode: [
+      1,1,1,1,1,1,
+      1,1,1,1,1,1,
+      1,1,1,
+      1,1,1,1,1,1,1,
+      1,1,1,1,1,1,1,
+    ]
+    kd: [
+      3,3,3,3,3,3,
+      3,3,3,3,3,3,
+      3,3,3,
+      3,3,3,3,3,3,3,  
+      3,3,3,3,3,3,3,  
+    ]
+  FixStand:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+      
+    kp: [
+      100., 100., 100., 150., 40., 40.,
+      100., 100., 100., 150., 40., 40.,
+      200,200,200,
+      40,40,40,40,40,40,40,
+      40,40,40,40,40,40,40,
+    ]
+    kd: [
+      2,2,2,4,2,2,
+      2,2,2,4,2,2,
+      5,5,5,
+      10,10,10,10,10,10,10,
+      10,10,10,10,10,10,10,
+    ]
+    ts: [0, 3]
+    qs: [
+      [],
+      [ -0.1, 0,0,0.3,-0.2,0,
+        -0.1, 0,0,0.3,-0.2,0,
+        0,0,0,
+        0, 0.25,0,0.97,0.15, 0,0,
+        0, -0.25,0,0.97,-0.15, 0,0
+      ]
+    ]
+  Velocity:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Mimic_Action_1: LT(2s) + up.on_pressed
+      Mimic_Action_2: LT(2s) + right.on_pressed
+      Mimic_Action_3: LT(2s) + down.on_pressed
+      Mimic_Action_4: LT(2s) + left.on_pressed
+    policy_dir: ../../policy/a1_23/velocity/
+
+  Mimic_Action_1:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 60
+    motion_file: ../../policy/a1_23/mocap/1231.csv
+    audio_file: ../../policy/a1_23/audio/12_3.wav
+    volume: 100
+    policy_dir: ../../policy/a1_23/mimic/
+    time_start: 0
+    time_end: 24.0
+
+  Mimic_Action_2:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 60
+    motion_file: ../../policy/a1_23/mocap/0421.csv
+    audio_file: ../../policy/a1_23/audio/4_2.wav
+    volume: 100
+    policy_dir: ../../policy/a1_23/mimic/
+    time_start: 0
+    time_end: 24.0
+
+  Mimic_Action_3:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 60
+    motion_file: ../../policy/a1_23/mocap/0721.csv
+    audio_file: ../../policy/a1_23/audio/7_2.wav
+    volume: 100
+    policy_dir: ../../policy/a1_23/mimic/
+    time_start: 0
+    time_end: 24.0
+
+  Mimic_Action_4:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 60
+    motion_file: ../../policy/a1_23/mocap/1311.csv
+    audio_file: ../../policy/a1_23/audio/13_1.wav
+    volume: 100
+    policy_dir: ../../policy/a1_23/mimic/
+    time_start: 0
+    time_end: 24.0
