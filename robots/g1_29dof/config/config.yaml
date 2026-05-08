@@ -1,10 +1,10 @@
 api:
   enabled: true
-  host: 127.0.0.1
+  host: 0.0.0.0
   port: 8080
 
 FSM:
-  _: # enabled fsms
+  _: 
     Passive:
       id: 1
     FixStand:
@@ -13,12 +13,12 @@ FSM:
       id: 3
       type: RLBase
 
-    Mimic_Dance_102: # uncomment to enable
+    Mimic_Dance_102: 
       id: 101
       type: Mimic
-    # Mimic_Gangnam_Style:
-    #   id: 102
-    #   type: Mimic
+    Mimic_Dance_103:
+      id: 102
+      type: Mimic
 
   Passive:
     transitions: 
@@ -70,22 +70,22 @@ FSM:
       Passive: LT + B.on_pressed
       Mimic_Dance_102: LT(2s) + down.on_pressed
       Mimic_Gangnam_Style: LT(2s) + left.on_pressed
-    policy_dir: /home/unitree/unitrree_g1_deployment/policy/g1_29/velocity
+    policy_dir: ../../policy/g1_29/velocity
   Mimic_Dance_102:
     transitions: 
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
     fps: 30
-    motion_file: /home/unitree/unitrree_g1_deployment/policy/g1_29/mocap/OPT_take_008_katya.csv
-    policy_dir: /home/unitree/unitrree_g1_deployment/policy/g1_29/mimic/
+    motion_file: ../../policy/g1_29/mocap/OPT_take_008_katya.csv
+    policy_dir: ../../policy/g1_29/mimic/
     time_start: 0
     time_end: 240
-  Mimic_Gangnam_Style:
+  Mimic_Dance_103:
     transitions: 
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
-    fps: 60
-    motion_file: config/policy/mimic/gangnam_style/params/G1_gangnam_style_V01.bvh_60hz.csv
-    policy_dir: config/policy/mimic/gangnam_style/
-    time_start: 5.2
+    fps: 30
+    motion_file: ../../policy/g1_29/mocap/OPT_take_008_katya.csv
+    policy_dir: ../../policy/g1_29/mimic/
+    time_start: 2
     time_end: 25.5
