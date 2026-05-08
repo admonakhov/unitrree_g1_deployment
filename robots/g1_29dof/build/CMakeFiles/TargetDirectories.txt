@@ -1,0 +1,4 @@
+/home/ant/kbp/unitrree_g1_deployment/robots/g1_29dof/build/CMakeFiles/g1_29dof_controller_lib.dir
+/home/ant/kbp/unitrree_g1_deployment/robots/g1_29dof/build/CMakeFiles/g1_ctrl.dir
+/home/ant/kbp/unitrree_g1_deployment/robots/g1_29dof/build/CMakeFiles/edit_cache.dir
+/home/ant/kbp/unitrree_g1_deployment/robots/g1_29dof/build/CMakeFiles/rebuild_cache.dir

@@ -50,6 +50,8 @@ int main(int argc, char** argv)
 
     std::cout << "Press [L2 + Up] to enter FixStand mode.\n";
     std::cout << "And then press [R1 + X] to start controlling the robot.\n";
+    std::cout << "API status: GET  /api/fsm\n";
+    std::cout << "API switch: POST /api/fsm/transition?state=Velocity\n";
 
     while (true)
     {
@@ -58,4 +60,3 @@ int main(int argc, char** argv)
     
     return 0;
 }
-

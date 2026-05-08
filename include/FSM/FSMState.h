@@ -30,6 +30,7 @@ public:
                 }
 
                 int fsm_id = FSMStringMap.right.at(target_fsm);
+                allowTransitionTo(fsm_id);
 
                 std::string condition = it->second;
                 unitree::common::dsl::Parser p(condition);
@@ -51,6 +52,7 @@ public:
                 FSMStringMap.right.at("Passive")
             )
         );
+        allowTransitionTo(FSMStringMap.right.at("Passive"));
     }
 
     void pre_run()

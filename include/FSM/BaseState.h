@@ -6,6 +6,7 @@
 #include <boost/bimap.hpp>
 #include <string>
 #include <any>
+#include <unordered_set>
 #include <utility>
 
 inline boost::bimap<int, std::string> FSMStringMap;
@@ -29,9 +30,13 @@ public:
     std::string getStateString() { return FSMStringMap.left.at(state_); }
     int getState() {return state_; }
     bool isState(int state) { return state_ == state; }
+    bool canTransitionTo(int state) const { return allowed_states_.count(state) > 0; }
+    void allowTransitionTo(int state) { allowed_states_.insert(state); }
+    const std::unordered_set<int>& allowedTransitions() const { return allowed_states_; }
     std::vector<std::pair<std::function<bool()>, int>> registered_checks;
 private:
     int state_;
+    std::unordered_set<int> allowed_states_;
 };
 
 using FsmFactory = std::function<std::shared_ptr<BaseState>(int, std::string)>;

@@ -3,8 +3,11 @@
 
 #pragma once
 
+#include <algorithm>
 #include <unitree/common/thread/recurrent_thread.hpp>
 #include "BaseState.h"
+#include "FSMApi.h"
+#include "param.h"
 #include <spdlog/spdlog.h>
 #include <yaml-cpp/yaml.h>
 
@@ -43,6 +46,14 @@ public:
             auto state_instance = fsm_class->second(id, fsm_name);
             add(state_instance);
         }
+
+        FSMApi::instance().configure(param::config["api"]);
+        std::vector<std::string> state_names;
+        state_names.reserve(states.size());
+        for (const auto& state : states) {
+            state_names.push_back(state->getStateString());
+        }
+        FSMApi::instance().setAvailableStates(state_names);
     }
 
     void start() 
@@ -50,6 +61,8 @@ public:
         // Start From State_Passive
         currentState = states[0];
         currentState->enter();
+        publishStateContext_();
+        FSMApi::instance().start();
 
         fsm_thread_ = std::make_shared<unitree::common::RecurrentThread>(
             "FSM", 0, this->dt * 1e6, &CtrlFSM::run_, this);
@@ -72,6 +85,7 @@ public:
     
     ~CtrlFSM()
     {
+        FSMApi::instance().stop();
         states.clear();
     }
 
@@ -87,7 +101,21 @@ private:
         
         // Check if need to change state
         int nextStateMode = 0;
-        for(int i(0); i<currentState->registered_checks.size(); i++)
+        if (auto requested_state = FSMApi::instance().consumeRequestedState()) {
+            if (*requested_state == currentState->getState()) {
+                nextStateMode = 0;
+            } else if (currentState->canTransitionTo(*requested_state)) {
+                nextStateMode = *requested_state;
+            } else {
+                spdlog::warn(
+                    "FSM API: transition from {} to {} is not allowed",
+                    currentState->getStateString(),
+                    FSMStringMap.left.at(*requested_state)
+                );
+            }
+        }
+
+        for(int i(0); nextStateMode == 0 && i<currentState->registered_checks.size(); i++)
         {
             if(currentState->registered_checks[i].first())
             {
@@ -106,10 +134,23 @@ private:
                     currentState->exit();
                     currentState = state;
                     currentState->enter();
+                    publishStateContext_();
                     break;
                 }
             }
         }
+    }
+
+    void publishStateContext_()
+    {
+        std::vector<std::string> allowed_targets;
+        for (const auto& target_id : currentState->allowedTransitions()) {
+            if (FSMStringMap.left.count(target_id)) {
+                allowed_targets.push_back(FSMStringMap.left.at(target_id));
+            }
+        }
+        std::sort(allowed_targets.begin(), allowed_targets.end());
+        FSMApi::instance().setCurrentStateContext(currentState->getStateString(), allowed_targets);
     }
 
     std::shared_ptr<BaseState> currentState;

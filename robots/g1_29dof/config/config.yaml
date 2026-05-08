@@ -1,3 +1,8 @@
+api:
+  enabled: true
+  host: 127.0.0.1
+  port: 8080
+
 FSM:
   _: # enabled fsms
     Passive:
@@ -84,4 +89,3 @@ FSM:
     policy_dir: config/policy/mimic/gangnam_style/
     time_start: 5.2
     time_end: 25.5
-
