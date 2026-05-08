@@ -3,6 +3,12 @@ api:
   host: 0.0.0.0
   port: 8080
 
+ros2_cmd_vel:
+  enabled: true
+  topic: /cmd_vel
+  timeout_sec: 0.5
+  node_name: g1_cmd_vel_bridge
+
 FSM:
   _: 
     Passive:

@@ -2,6 +2,7 @@
 #include "FSM/State_Passive.h"
 #include "FSM/State_FixStand.h"
 #include "FSM/State_RLBase.h"
+#include "Ros2CmdVelBridge.h"
 #include "State_Mimic.h"
 
 std::unique_ptr<LowCmd_t> FSMState::lowcmd = nullptr;
@@ -45,6 +46,9 @@ int main(int argc, char** argv)
     }
     
     // Initialize FSM
+    Ros2CmdVelBridge::instance().configure(param::config["ros2_cmd_vel"]);
+    Ros2CmdVelBridge::instance().start();
+
     auto fsm = std::make_unique<CtrlFSM>(param::config["FSM"]);
     fsm->start();
 
@@ -52,6 +56,7 @@ int main(int argc, char** argv)
     std::cout << "And then press [R1 + X] to start controlling the robot.\n";
     std::cout << "API status: GET  /api/fsm\n";
     std::cout << "API switch: POST /api/fsm/transition?state=Velocity\n";
+    std::cout << "ROS2 cmd_vel: geometry_msgs/msg/Twist on /cmd_vel\n";
 
     while (true)
     {

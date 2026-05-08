@@ -1,4 +1,5 @@
 #include "FSM/State_RLBase.h"
+#include "Ros2CmdVelBridge.h"
 #include "unitree_articulation.h"
 #include "isaaclab/envs/mdp/observations/observations.h"
 #include "isaaclab/envs/mdp/actions/joint_actions.h"
@@ -27,6 +28,33 @@ REGISTER_OBSERVATION(keyboard_velocity_commands)
         // TODO: smooth and limit the velocity commands
         cmd = key_commands[key];
     }
+    return cmd;
+}
+
+REGISTER_OBSERVATION(ros2_cmd_vel_commands)
+{
+    static auto cfg = env->cfg["commands"]["base_velocity"]["ranges"];
+    auto sample = Ros2CmdVelBridge::instance().sample();
+
+    std::vector<float> cmd(3, 0.0f);
+    if (sample.active && sample.recent)
+    {
+        cmd[0] = sample.command[0];
+        cmd[1] = sample.command[1];
+        cmd[2] = sample.command[2];
+    }
+    else
+    {
+        // Preserve manual fallback when ROS2 cmd_vel is unavailable or stale.
+        auto & joystick = env->robot->data.joystick;
+        cmd[0] = joystick->ly();
+        cmd[1] = -joystick->lx();
+        cmd[2] = -joystick->rx();
+    }
+
+    cmd[0] = std::clamp(cmd[0], cfg["lin_vel_x"][0].as<float>(), cfg["lin_vel_x"][1].as<float>());
+    cmd[1] = std::clamp(cmd[1], cfg["lin_vel_y"][0].as<float>(), cfg["lin_vel_y"][1].as<float>());
+    cmd[2] = std::clamp(cmd[2], cfg["ang_vel_z"][0].as<float>(), cfg["ang_vel_z"][1].as<float>());
     return cmd;
 }
 
