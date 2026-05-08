@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <cctype>
@@ -29,6 +30,13 @@
 class FSMApi
 {
 public:
+    struct VelocityCommandSample
+    {
+        std::array<float, 3> command {0.0f, 0.0f, 0.0f};
+        bool recent = false;
+        bool active = false;
+    };
+
     static FSMApi& instance()
     {
         static FSMApi api;
@@ -41,6 +49,7 @@ public:
         enabled_ = cfg && cfg["enabled"] ? cfg["enabled"].as<bool>() : false;
         host_ = cfg && cfg["host"] ? cfg["host"].as<std::string>() : "127.0.0.1";
         port_ = cfg && cfg["port"] ? cfg["port"].as<int>() : 8080;
+        cmd_vel_timeout_sec_ = cfg && cfg["cmd_vel_timeout_sec"] ? cfg["cmd_vel_timeout_sec"].as<float>() : 0.5f;
     }
 
     void setAvailableStates(const std::vector<std::string>& states)
@@ -97,6 +106,31 @@ public:
         std::lock_guard<std::mutex> lock(mutex_);
         requested_state_id_.reset();
         requested_state_name_.clear();
+    }
+
+    void setVelocityCommand(float vx, float vy, float wz)
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        velocity_command_ = {vx, vy, wz};
+        velocity_command_timestamp_ = std::chrono::steady_clock::now();
+        velocity_command_received_ = true;
+    }
+
+    VelocityCommandSample velocityCommandSample() const
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        VelocityCommandSample sample;
+        sample.active = enabled_;
+        sample.command = velocity_command_;
+        if (!velocity_command_received_) {
+            return sample;
+        }
+
+        const auto age = std::chrono::duration_cast<std::chrono::duration<float>>(
+            std::chrono::steady_clock::now() - velocity_command_timestamp_
+        ).count();
+        sample.recent = age <= cmd_vel_timeout_sec_;
+        return sample;
     }
 
     void start()
@@ -232,9 +266,52 @@ private:
         return body.substr(first_quote + 1, second_quote - first_quote - 1);
     }
 
+    static std::optional<float> parseFloatValue(const std::string& value)
+    {
+        if (value.empty()) {
+            return std::nullopt;
+        }
+
+        char* end = nullptr;
+        const float parsed = std::strtof(value.c_str(), &end);
+        if (end == nullptr || *end != '\0') {
+            return std::nullopt;
+        }
+        return parsed;
+    }
+
+    static std::optional<float> extractJsonFloat(const std::string& body, const std::string& key)
+    {
+        const auto needle = "\"" + key + "\"";
+        auto key_pos = body.find(needle);
+        if (key_pos == std::string::npos) {
+            return std::nullopt;
+        }
+        auto colon_pos = body.find(':', key_pos + needle.size());
+        if (colon_pos == std::string::npos) {
+            return std::nullopt;
+        }
+
+        auto value_start = body.find_first_not_of(" \t\r\n", colon_pos + 1);
+        if (value_start == std::string::npos) {
+            return std::nullopt;
+        }
+
+        auto value_end = body.find_first_of(",}\r\n", value_start);
+        const auto token = trim(body.substr(value_start, value_end - value_start));
+        return parseFloatValue(token);
+    }
+
     std::string statusJson()
     {
         std::lock_guard<std::mutex> lock(mutex_);
+        bool cmd_vel_recent = false;
+        if (velocity_command_received_) {
+            const auto age = std::chrono::duration_cast<std::chrono::duration<float>>(
+                std::chrono::steady_clock::now() - velocity_command_timestamp_
+            ).count();
+            cmd_vel_recent = age <= cmd_vel_timeout_sec_;
+        }
         std::ostringstream out;
         out << "{";
         out << "\"enabled\":" << (enabled_ ? "true" : "false") << ",";
@@ -257,7 +334,13 @@ private:
             if (i > 0) out << ",";
             out << "\"" << jsonEscape(available_policies_[i]) << "\"";
         }
-        out << "]";
+        out << "],";
+        out << "\"cmd_vel\":{";
+        out << "\"vx\":" << velocity_command_[0] << ",";
+        out << "\"vy\":" << velocity_command_[1] << ",";
+        out << "\"wz\":" << velocity_command_[2] << ",";
+        out << "\"recent\":" << (cmd_vel_recent ? "true" : "false");
+        out << "}";
         out << "}";
         return out.str();
     }
@@ -296,6 +379,49 @@ private:
 
         status_code = 202;
         return "{\"ok\":true,\"requested_state\":\"" + jsonEscape(clean_state) + "\"}";
+    }
+
+    std::string cmdVelJson()
+    {
+        const auto sample = velocityCommandSample();
+        float timeout_sec = 0.5f;
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            timeout_sec = cmd_vel_timeout_sec_;
+        }
+        std::ostringstream out;
+        out << "{";
+        out << "\"ok\":true,";
+        out << "\"vx\":" << sample.command[0] << ",";
+        out << "\"vy\":" << sample.command[1] << ",";
+        out << "\"wz\":" << sample.command[2] << ",";
+        out << "\"recent\":" << (sample.recent ? "true" : "false") << ",";
+        out << "\"timeout_sec\":" << timeout_sec;
+        out << "}";
+        return out.str();
+    }
+
+    std::string updateCmdVel(
+        const std::unordered_map<std::string, std::string>& query_params,
+        const std::string& request_body,
+        int& status_code)
+    {
+        auto vx = query_params.count("vx") ? parseFloatValue(query_params.at("vx")) : std::nullopt;
+        auto vy = query_params.count("vy") ? parseFloatValue(query_params.at("vy")) : std::nullopt;
+        auto wz = query_params.count("wz") ? parseFloatValue(query_params.at("wz")) : std::nullopt;
+
+        if (!vx) vx = extractJsonFloat(request_body, "vx");
+        if (!vy) vy = extractJsonFloat(request_body, "vy");
+        if (!wz) wz = extractJsonFloat(request_body, "wz");
+
+        if (!vx || !vy || !wz) {
+            status_code = 400;
+            return "{\"ok\":false,\"error\":\"vx, vy and wz are required\"}";
+        }
+
+        setVelocityCommand(*vx, *vy, *wz);
+        status_code = 202;
+        return cmdVelJson();
     }
 
     void sendResponse(int client_fd, int status_code, const std::string& body)
@@ -367,20 +493,23 @@ private:
 
         std::string path = target;
         std::string query;
+        std::unordered_map<std::string, std::string> query_params;
         if (const auto pos = target.find('?'); pos != std::string::npos) {
             path = target.substr(0, pos);
             query = target.substr(pos + 1);
+            query_params = parseQuery(query);
         }
 
         if (method == "GET" && (path == "/api/fsm" || path == "/api/policies")) {
             body = statusJson();
+        } else if (method == "GET" && path == "/api/cmd_vel") {
+            body = cmdVelJson();
+        } else if ((method == "POST" || method == "GET") && path == "/api/cmd_vel") {
+            body = updateCmdVel(query_params, request_body, status_code);
         } else if ((method == "POST" || method == "GET") && (path == "/api/fsm/transition" || path == "/api/policies/switch")) {
             std::string requested_state;
-            if (!query.empty()) {
-                auto query_params = parseQuery(query);
-                if (query_params.count("state")) {
-                    requested_state = query_params["state"];
-                }
+            if (query_params.count("state")) {
+                requested_state = query_params["state"];
             }
             if (requested_state.empty()) {
                 requested_state = extractJsonString(request_body, "state");
@@ -473,7 +602,7 @@ private:
         listen_fd_ = -1;
     }
 
-    std::mutex mutex_;
+    mutable std::mutex mutex_;
     bool enabled_ = false;
     std::string host_ = "127.0.0.1";
     int port_ = 8080;
@@ -483,6 +612,10 @@ private:
     std::string current_state_;
     std::optional<int> requested_state_id_;
     std::string requested_state_name_;
+    std::array<float, 3> velocity_command_ {0.0f, 0.0f, 0.0f};
+    bool velocity_command_received_ = false;
+    float cmd_vel_timeout_sec_ = 0.5f;
+    std::chrono::steady_clock::time_point velocity_command_timestamp_ = std::chrono::steady_clock::now();
     std::atomic<bool> running_ = false;
     std::thread server_thread_;
     std::atomic<int> listen_fd_ = -1;

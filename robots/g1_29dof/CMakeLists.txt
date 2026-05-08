@@ -5,8 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 find_package(Boost REQUIRED COMPONENTS program_options)
 find_package(yaml-cpp REQUIRED)
-find_package(rclcpp QUIET)
-find_package(geometry_msgs QUIET)
 
 include_directories(
   /usr/include/eigen3
@@ -28,26 +26,6 @@ file(GLOB_RECURSE ADD_SRC_LIST
 )
 
 add_library(${PROJECT_NAME}_lib ${ADD_SRC_LIST})
-if(rclcpp_FOUND AND geometry_msgs_FOUND)
-  target_compile_definitions(${PROJECT_NAME}_lib PUBLIC UNITREE_HAVE_ROS2_CMD_VEL)
-endif()
-
-if(TARGET rclcpp::rclcpp)
-  target_link_libraries(${PROJECT_NAME}_lib PUBLIC rclcpp::rclcpp)
-endif()
-
-if(TARGET geometry_msgs::geometry_msgs__rosidl_typesupport_cpp)
-  target_link_libraries(${PROJECT_NAME}_lib PUBLIC geometry_msgs::geometry_msgs__rosidl_typesupport_cpp)
-endif()
-
-if(TARGET geometry_msgs::geometry_msgs__rosidl_generator_c)
-  target_link_libraries(${PROJECT_NAME}_lib PUBLIC geometry_msgs::geometry_msgs__rosidl_generator_c)
-endif()
-
-if(TARGET geometry_msgs::geometry_msgs__rosidl_generator_cpp)
-  target_link_libraries(${PROJECT_NAME}_lib PUBLIC geometry_msgs::geometry_msgs__rosidl_generator_cpp)
-endif()
-
 link_libraries(${PROJECT_NAME}_lib)
 
 add_executable(g1_ctrl main.cpp)

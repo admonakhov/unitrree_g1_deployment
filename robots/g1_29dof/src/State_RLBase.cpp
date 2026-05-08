@@ -1,5 +1,5 @@
 #include "FSM/State_RLBase.h"
-#include "Ros2CmdVelBridge.h"
+#include "FSM/FSMApi.h"
 #include "unitree_articulation.h"
 #include "isaaclab/envs/mdp/observations/observations.h"
 #include "isaaclab/envs/mdp/actions/joint_actions.h"
@@ -31,10 +31,10 @@ REGISTER_OBSERVATION(keyboard_velocity_commands)
     return cmd;
 }
 
-REGISTER_OBSERVATION(ros2_cmd_vel_commands)
+REGISTER_OBSERVATION(api_cmd_vel_commands)
 {
     static auto cfg = env->cfg["commands"]["base_velocity"]["ranges"];
-    auto sample = Ros2CmdVelBridge::instance().sample();
+    auto sample = FSMApi::instance().velocityCommandSample();
 
     std::vector<float> cmd(3, 0.0f);
     if (sample.active && sample.recent)
@@ -45,7 +45,7 @@ REGISTER_OBSERVATION(ros2_cmd_vel_commands)
     }
     else
     {
-        // Preserve manual fallback when ROS2 cmd_vel is unavailable or stale.
+        // Preserve manual fallback when API cmd_vel is unavailable or stale.
         auto & joystick = env->robot->data.joystick;
         cmd[0] = joystick->ly();
         cmd[1] = -joystick->lx();
