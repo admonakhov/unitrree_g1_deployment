@@ -2,9 +2,25 @@
 #include "unitree_articulation.h"
 #include "isaaclab/envs/mdp/observations/observations.h"
 #include "isaaclab/envs/mdp/actions/joint_actions.h"
+#include <stdexcept>
 
 static Eigen::Quaternionf init_quat;
 std::shared_ptr<State_Mimic::MotionLoader_> State_Mimic::motion = nullptr;
+
+namespace {
+Eigen::VectorXf remap_motion_to_joint_ids(const Eigen::VectorXf& data_dfs, const std::vector<float>& ids)
+{
+    Eigen::VectorXf data_bfs = Eigen::VectorXf::Zero(ids.size());
+    for (int i = 0; i < ids.size(); ++i) {
+        const int joint_id = static_cast<int>(ids[i]);
+        if (joint_id < 0 || joint_id >= data_dfs.size()) {
+            throw std::runtime_error("joint_ids_map contains an index outside the motion DOF vector");
+        }
+        data_bfs(i) = data_dfs[joint_id];
+    }
+    return data_bfs;
+}
+}
 
 Eigen::Quaternionf torso_quat_w(isaaclab::ManagerBasedRLEnv* env) {
     using G1Type = unitree::BaseArticulation<LowState_t::SharedPtr>;
@@ -46,10 +62,7 @@ REGISTER_OBSERVATION(motion_joint_pos)
     auto & ids = robot->data.joint_ids_map;
 
     auto data_dfs = loader->joint_pos();
-    Eigen::VectorXf data_bfs = Eigen::VectorXf::Zero(data_dfs.size());
-    for(int i = 0; i < data_dfs.size(); ++i) {
-        data_bfs(i) = data_dfs[ids[i]];
-    }
+    Eigen::VectorXf data_bfs = remap_motion_to_joint_ids(data_dfs, ids);
     return std::vector<float>(data_bfs.data(), data_bfs.data() + data_bfs.size());
 }
 
@@ -60,10 +73,7 @@ REGISTER_OBSERVATION(motion_joint_vel)
     auto & ids = robot->data.joint_ids_map;
 
     auto data_dfs = loader->joint_vel();
-    Eigen::VectorXf data_bfs = Eigen::VectorXf::Zero(data_dfs.size());
-    for(int i = 0; i < data_dfs.size(); ++i) {
-        data_bfs(i) = data_dfs[ids[i]];
-    }
+    Eigen::VectorXf data_bfs = remap_motion_to_joint_ids(data_dfs, ids);
     return std::vector<float>(data_bfs.data(), data_bfs.data() + data_bfs.size());
 }
 
@@ -74,15 +84,9 @@ REGISTER_OBSERVATION(motion_command)
     auto & ids = robot->data.joint_ids_map;
 
     auto pos_dfs = loader->joint_pos();
-    Eigen::VectorXf pos_bfs = Eigen::VectorXf::Zero(pos_dfs.size());
-    for(int i = 0; i < pos_dfs.size(); ++i) {
-        pos_bfs(i) = pos_dfs[ids[i]];
-    }
+    Eigen::VectorXf pos_bfs = remap_motion_to_joint_ids(pos_dfs, ids);
     auto vel_dfs = loader->joint_vel();
-    Eigen::VectorXf vel_bfs = Eigen::VectorXf::Zero(vel_dfs.size());
-    for(int i = 0; i < vel_dfs.size(); ++i) {
-        vel_bfs(i) = vel_dfs[ids[i]];
-    }
+    Eigen::VectorXf vel_bfs = remap_motion_to_joint_ids(vel_dfs, ids);
     std::vector<float> data;
     data.insert(data.end(), pos_bfs.data(), pos_bfs.data() + pos_bfs.size());
     data.insert(data.end(), vel_bfs.data(), vel_bfs.data() + vel_bfs.size());
