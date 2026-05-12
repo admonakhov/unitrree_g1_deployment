@@ -51,7 +51,7 @@ int main(int argc, char** argv)
     std::cout << "And then press [R1 + X] to start controlling the robot.\n";
     std::cout << "API status: GET  /api/fsm\n";
     std::cout << "API switch: POST /api/fsm/transition?state=Velocity\n";
-    std::cout << "API cmd_vel: POST /api/cmd_vel?vx=0.2&vy=0&wz=0\n";
+    std::cout << "API cmd_vel: POST /cmd_vel?vx=0.2&vy=0&wz=0\n";
 
     while (true)
     {

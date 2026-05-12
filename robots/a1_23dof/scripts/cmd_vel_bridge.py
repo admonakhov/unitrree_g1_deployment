@@ -17,7 +17,7 @@ class CmdVelHttpBridge(Node):
     def __init__(self, controller_url: str, topic: str, publish_rate: float, input_timeout: float) -> None:
         super().__init__("g1_cmd_vel_http_bridge")
         self._controller_url = controller_url.rstrip("/")
-        self._cmd_vel_endpoint = f"{self._controller_url}/api/cmd_vel"
+        self._cmd_vel_endpoint = f"{self._controller_url}/cmd_vel"
         self._input_timeout = input_timeout
         self._lock = threading.Lock()
         self._last_command = {"vx": 0.0, "vy": 0.0, "wz": 0.0}

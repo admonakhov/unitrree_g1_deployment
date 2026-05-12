@@ -502,9 +502,9 @@ private:
 
         if (method == "GET" && (path == "/api/fsm" || path == "/api/policies")) {
             body = statusJson();
-        } else if (method == "GET" && path == "/api/cmd_vel") {
+        } else if (method == "GET" && (path == "/cmd_vel" || path == "/api/cmd_vel")) {
             body = cmdVelJson();
-        } else if ((method == "POST" || method == "GET") && path == "/api/cmd_vel") {
+        } else if ((method == "POST" || method == "GET") && (path == "/cmd_vel" || path == "/api/cmd_vel")) {
             body = updateCmdVel(query_params, request_body, status_code);
         } else if ((method == "POST" || method == "GET") && (path == "/api/fsm/transition" || path == "/api/policies/switch")) {
             std::string requested_state;
