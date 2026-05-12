@@ -1,7 +1,7 @@
-task: Arcus-A1-23dof-Tracking
+task: Arcus-A1-23dof-Tracking-IL
 alg: PPO
 cfg: null
-num_envs: null
+num_envs: 12000
 seed: 42
 replicate: null
 rldevice: cuda:0

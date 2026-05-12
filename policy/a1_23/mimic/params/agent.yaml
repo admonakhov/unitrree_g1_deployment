@@ -33,7 +33,7 @@ algorithm:
   normalize_advantage_per_mini_batch: false
 clip_actions: null
 save_interval: 500
-experiment_name: a1_track
+experiment_name: Arcus-A1-23dof-Tracking-IL
 run_name: origin
 logger: tensorboard
 neptune_project: isaaclab

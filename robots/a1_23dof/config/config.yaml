@@ -76,7 +76,7 @@ FSM:
     transitions: 
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
-    fps: 30
+    fps: 25
     motion_file: ../../policy/a1_23/mocap/1211.csv
     policy_dir: ../../policy/a1_23/mimic/
     time_start: 0
@@ -85,7 +85,7 @@ FSM:
     transitions: 
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
-    fps: 30
+    fps: 25
     motion_file: ../../policy/a1_23/mocap/1221.csv
     policy_dir: ../../policy/a1_23/mimic/
     time_start: 2
