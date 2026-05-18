@@ -86,7 +86,7 @@ FSM:
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
     fps: 30
-    motion_file: ../../policy/g1_29/mocap/OPT_take_008_katya.csv
-    policy_dir: ../../policy/g1_29/mimic/
+    motion_file: ../../policy/g1_29/mocap/frightened.csv
+    policy_dir: ../../policy/g1_29/mimic/frightened
     time_start: 0
     time_end: 25
