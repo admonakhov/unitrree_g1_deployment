@@ -77,10 +77,10 @@ FSM:
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
     fps: 30
-    motion_file: ../../policy/g1_29/mocap/OPT_take_008_katya.csv
-    policy_dir: ../../policy/g1_29/mimic/
+    motion_file: ../../policy/g1_29/mocap/contrabass.csv
+    policy_dir: ../../policy/g1_29/mimic/contrabass
     time_start: 0
-    time_end: 8
+    time_end: 25
   Mimic_Dance_103:
     transitions: 
       Passive: LT + B.on_pressed
@@ -88,5 +88,5 @@ FSM:
     fps: 30
     motion_file: ../../policy/g1_29/mocap/OPT_take_008_katya.csv
     policy_dir: ../../policy/g1_29/mimic/
-    time_start: 10
-    time_end: 8
+    time_start: 0
+    time_end: 25
