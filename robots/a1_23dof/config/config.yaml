@@ -17,9 +17,9 @@ FSM:
     Mimic_Dance_102: 
       id: 101
       type: Mimic
-    Mimic_Dance_103:
-      id: 102
-      type: Mimic
+    # Mimic_Dance_103:
+    #   id: 102
+    #   type: Mimic
 
   Passive:
     transitions: 
@@ -76,16 +76,16 @@ FSM:
     transitions: 
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
-    fps: 25
-    motion_file: ../../policy/a1_23/mocap/1211.csv
-    policy_dir: ../../policy/a1_23/mimic/
+    fps: 30
+    motion_file: ../../policy/a1_23/mocap/frightened.csv
+    policy_dir: ../../policy/a1_23/mimic/frightened
     time_start: 0
-    time_end: 240
+    time_end: 250
   Mimic_Dance_103:
     transitions: 
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
-    fps: 25
+    fps: 30
     motion_file: ../../policy/a1_23/mocap/1221.csv
     policy_dir: ../../policy/a1_23/mimic/
     time_start: 2
