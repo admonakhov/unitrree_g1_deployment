@@ -20,9 +20,14 @@ FSM:
     Mimic_Dance_102:
       id: 102
       type: Mimic
-
     Mimic_Dance_103:
       id: 103
+      type: Mimic
+    Mimic_Dance_104:
+      id: 104
+      type: Mimic
+    Mimic_Dance_105:
+      id: 105
       type: Mimic
 
   Passive:
@@ -76,6 +81,8 @@ FSM:
       Mimic_Dance_101: LT(2s) + down.on_pressed
       Mimic_Dance_102: LT(2s) + left.on_pressed
       Mimic_Dance_103: LT(2s) + right.on_pressed
+      Mimic_Dance_104: LB(2s) + left.on_pressed
+      Mimic_Dance_105: LB(2s) + right.on_pressed
     policy_dir: ../../policy/g1_29/velocity_v2
   Mimic_Dance_101:
     transitions: 
@@ -95,6 +102,7 @@ FSM:
     policy_dir: ../../policy/g1_29/mimic/frightened
     time_start: 0
     time_end: 25
+
   Mimic_Dance_103:
     transitions: 
       Passive: LT + B.on_pressed
@@ -102,5 +110,25 @@ FSM:
     fps: 30
     motion_file: ../../policy/g1_29/mocap/typing.csv
     policy_dir: ../../policy/g1_29/mimic/typing
+    time_start: 0
+    time_end: 25
+
+  Mimic_Dance_104:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 30
+    motion_file: ../../policy/g1_29/mocap/knocking.csv
+    policy_dir: ../../policy/g1_29/mimic/knocking
+    time_start: 0
+    time_end: 25
+
+  Mimic_Dance_105:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 30
+    motion_file: ../../policy/g1_29/mocap/typing2.csv
+    policy_dir: ../../policy/g1_29/mimic/typing2
     time_start: 0
     time_end: 25

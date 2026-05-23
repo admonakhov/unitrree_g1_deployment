@@ -14,12 +14,16 @@ FSM:
       id: 3
       type: RLBase
 
-    Mimic_Dance_102: 
+    Mimic_Dance_101: 
       id: 101
       type: Mimic
+    Mimic_Dance_102:
+      id: 102
+      type: Mimic
     # Mimic_Dance_103:
-    #   id: 102
+    #   id: 103
     #   type: Mimic
+
 
   Passive:
     transitions: 
@@ -69,10 +73,11 @@ FSM:
   Velocity:
     transitions: 
       Passive: LT + B.on_pressed
-      Mimic_Dance_102: LT(2s) + down.on_pressed
-      Mimic_Dance_103: LT(2s) + left.on_pressed
+      Mimic_Dance_101: LT(2s) + down.on_pressed
+      Mimic_Dance_102: LT(2s) + left.on_pressed
+      Mimic_Dance_103: LT(2s) + right.on_pressed
     policy_dir: ../../policy/a1_23/velocity
-  Mimic_Dance_102:
+  Mimic_Dance_101:
     transitions: 
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
@@ -80,13 +85,22 @@ FSM:
     motion_file: ../../policy/a1_23/mocap/frightened.csv
     policy_dir: ../../policy/a1_23/mimic/frightened
     time_start: 0
-    time_end: 250
+    time_end: 25
+  Mimic_Dance_102:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 30
+    motion_file: ../../policy/a1_23/mocap/frightened.csv
+    policy_dir: ../../policy/a1_23/mimic/1
+    time_start: 0
+    time_end: 25
   Mimic_Dance_103:
     transitions: 
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
     fps: 30
-    motion_file: ../../policy/a1_23/mocap/1221.csv
-    policy_dir: ../../policy/a1_23/mimic/
-    time_start: 2
-    time_end: 25.5
+    motion_file: ../../policy/a1_23/mocap/2.csv
+    policy_dir: ../../policy/a1_23/mimic/2
+    time_start: 0
+    time_end: 25
