@@ -91,7 +91,7 @@ FSM:
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
     fps: 30
-    motion_file: ../../policy/a1_23/mocap/frightened.csv
+    motion_file: ../../policy/a1_23/mocap/1.csv
     policy_dir: ../../policy/a1_23/mimic/1
     time_start: 0
     time_end: 25
