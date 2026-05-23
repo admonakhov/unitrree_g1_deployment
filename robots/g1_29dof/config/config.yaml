@@ -14,11 +14,15 @@ FSM:
       id: 3
       type: RLBase
 
-    Mimic_Dance_102: 
+    Mimic_Dance_101: 
       id: 101
       type: Mimic
-    Mimic_Dance_103:
+    Mimic_Dance_102:
       id: 102
+      type: Mimic
+
+    Mimic_Dance_103:
+      id: 103
       type: Mimic
 
   Passive:
@@ -69,10 +73,11 @@ FSM:
   Velocity:
     transitions: 
       Passive: LT + B.on_pressed
-      Mimic_Dance_102: LT(2s) + down.on_pressed
-      Mimic_Dance_103: LT(2s) + left.on_pressed
-    policy_dir: ../../policy/g1_29/velocity
-  Mimic_Dance_102:
+      Mimic_Dance_101: LT(2s) + down.on_pressed
+      Mimic_Dance_102: LT(2s) + left.on_pressed
+      Mimic_Dance_103: LT(2s) + right.on_pressed
+    policy_dir: ../../policy/g1_29/velocity_v2
+  Mimic_Dance_101:
     transitions: 
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
@@ -81,12 +86,21 @@ FSM:
     policy_dir: ../../policy/g1_29/mimic/contrabass
     time_start: 0
     time_end: 25
-  Mimic_Dance_103:
+  Mimic_Dance_102:
     transitions: 
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
     fps: 30
     motion_file: ../../policy/g1_29/mocap/frightened.csv
     policy_dir: ../../policy/g1_29/mimic/frightened
+    time_start: 0
+    time_end: 25
+  Mimic_Dance_103:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 30
+    motion_file: ../../policy/g1_29/mocap/typing.csv
+    policy_dir: ../../policy/g1_29/mimic/typing
     time_start: 0
     time_end: 25
