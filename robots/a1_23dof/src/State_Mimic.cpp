@@ -186,10 +186,10 @@ void State_Mimic::enter()
         const auto start = clock::now();
         auto sleepTill = start + dt;
 
+        motion->reset(env->robot->data, time_range_[0]);
         auto ref_yaw = isaaclab::yawQuaternion(motion->root_quaternion()).toRotationMatrix();
         auto robot_yaw = isaaclab::yawQuaternion(torso_quat_w(env.get())).toRotationMatrix();
         init_quat = robot_yaw * ref_yaw.transpose();
-        motion->reset(env->robot->data, time_range_[0]);
         env->reset();
 
         while (policy_thread_running)
