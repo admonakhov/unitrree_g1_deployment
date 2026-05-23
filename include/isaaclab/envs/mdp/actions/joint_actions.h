@@ -38,8 +38,21 @@ public:
 
     virtual void process_actions(std::vector<float> actions)
     {
-        // TODO: modify action by joint_ids
         _raw_actions = actions;
+        update_processed_actions();
+    }
+
+    void reset()
+    {
+        _raw_actions.assign(_action_dim, 0.0f);
+        update_processed_actions();
+    }
+
+protected:
+    void update_processed_actions()
+    {
+        // Keep reset state consistent with the policy action transform so re-entry
+        // does not briefly replay the previous processed command.
         for(int i(0); i<_action_dim; ++i)
         {
             if(!_scale.empty()) {
@@ -59,8 +72,8 @@ public:
         }
     }
 
-
-    int action_dim() 
+public:
+    int action_dim()
     {
         return _action_dim;
     }
@@ -74,13 +87,6 @@ public:
     {
         return _processed_actions;
     }
-
-    void reset()
-    {
-        _raw_actions.assign(_action_dim, 0.0f);
-    }
-
-protected:
     int _action_dim;
     std::vector<int> _joint_ids;
 
