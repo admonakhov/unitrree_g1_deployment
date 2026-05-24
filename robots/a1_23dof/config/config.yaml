@@ -20,9 +20,9 @@ FSM:
     Mimic_Dance_102:
       id: 102
       type: Mimic
-    # Mimic_Dance_103:
-    #   id: 103
-    #   type: Mimic
+    Mimic_Dance_103:
+      id: 103
+      type: Mimic
 
 
   Passive:
