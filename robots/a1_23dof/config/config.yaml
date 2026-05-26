@@ -23,7 +23,15 @@ FSM:
     Mimic_Dance_103:
       id: 103
       type: Mimic
-
+    # Mimic_Dance_104:
+    #   id: 104
+    #   type: Mimic
+    Mimic_Dance_105:
+      id: 105
+      type: Mimic
+    Mimic_Dance_106:
+      id: 106
+      type: Mimic
 
   Passive:
     transitions: 
@@ -76,6 +84,9 @@ FSM:
       Mimic_Dance_101: LT(2s) + down.on_pressed
       Mimic_Dance_102: LT(2s) + left.on_pressed
       Mimic_Dance_103: LT(2s) + right.on_pressed
+      Mimic_Dance_104: LB(2s) + left.on_pressed
+      Mimic_Dance_105: LB(2s) + right.on_pressed
+      Mimic_Dance_106: LB(2s) + down.on_pressed
     policy_dir: ../../policy/a1_23/velocity
   Mimic_Dance_101:
     transitions: 
@@ -103,4 +114,31 @@ FSM:
     motion_file: ../../policy/a1_23/mocap/2.csv
     policy_dir: ../../policy/a1_23/mimic/2
     time_start: 0
-    time_end: 25
+    time_end: 60
+  Mimic_Dance_104:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 30
+    motion_file: ../../policy/a1_23/mocap/contrabass.csv
+    policy_dir: ../../policy/a1_23/mimic/contrabass
+    time_start: 0
+    time_end: 60
+  Mimic_Dance_105:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 30
+    motion_file: ../../policy/a1_23/mocap/piano2.csv
+    policy_dir: ../../policy/a1_23/mimic/piano2
+    time_start: 0
+    time_end: 60
+  Mimic_Dance_106:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 30
+    motion_file: ../../policy/a1_23/mocap/piano_fin.csv
+    policy_dir: ../../policy/a1_23/mimic/piano_fin
+    time_start: 0
+    time_end: 60
