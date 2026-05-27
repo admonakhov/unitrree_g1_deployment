@@ -41,6 +41,9 @@ FSM:
     Mimic_Dance_109:
       id: 109
       type: Mimic
+    Mimic_Dance_110:
+      id: 110
+      type: Mimic
 
 
 
@@ -101,6 +104,7 @@ FSM:
       Mimic_Dance_107: LB(2s) + up.on_pressed
       Mimic_Dance_108: RT(2s) + up.on_pressed
       Mimic_Dance_109: RT(2s) + down.on_pressed
+      Mimic_Dance_110: RT(2s) + left.on_pressed
     policy_dir: ../../policy/a1_23/velocity
   Mimic_Dance_101:
     transitions: 
@@ -152,8 +156,8 @@ FSM:
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
     fps: 30
-    motion_file: ../../policy/a1_23/mocap/piano_fin.csv
-    policy_dir: ../../policy/a1_23/mimic/piano_fin
+    motion_file: ../../policy/a1_23/mocap/new/piano_fin.csv
+    policy_dir: ../../policy/a1_23/mimic/piano_fin/new
     time_start: 0
     time_end: 60
   Mimic_Dance_107:
@@ -181,5 +185,15 @@ FSM:
     fps: 30
     motion_file: ../../policy/a1_23/mocap/keys.csv
     policy_dir: ../../policy/a1_23/mimic/keys
+    time_start: 0
+    time_end: 60
+
+  Mimic_Dance_110:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 30
+    motion_file: ../../policy/a1_23/mocap/new/keys_fin.csv
+    policy_dir: ../../policy/a1_23/mimic/keys_fin
     time_start: 0
     time_end: 60
