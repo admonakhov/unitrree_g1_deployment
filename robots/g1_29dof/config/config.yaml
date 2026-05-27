@@ -53,12 +53,12 @@ FSM:
     Mimic_Dance_113:
       id: 113
       type: Mimic
-    # Mimic_Dance_114:
-    #   id: 114
-    #   type: Mimic
-    # Mimic_Dance_115:
-    #   id: 115
-    #   type: Mimic
+    Mimic_Dance_114:
+      id: 114
+      type: Mimic
+    Mimic_Dance_115:
+      id: 115
+      type: Mimic
 
 
   Passive:
