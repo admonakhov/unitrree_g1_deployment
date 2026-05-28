@@ -59,7 +59,18 @@ FSM:
     Mimic_Dance_115:
       id: 115
       type: Mimic
-
+    Mimic_Dance_116:
+      id: 116
+      type: Mimic
+    Mimic_Dance_117:
+      id: 117
+      type: Mimic
+    # Mimic_Dance_118:
+    #   id: 118
+    #   type: Mimic
+    # Mimic_Dance_119:
+    #   id: 119
+    #   type: Mimic
 
   Passive:
     transitions: 
@@ -124,6 +135,10 @@ FSM:
       Mimic_Dance_113: RB(2s) + down.on_pressed
       Mimic_Dance_114: RB(2s) + left.on_pressed
       Mimic_Dance_115: RB(2s) + right.on_pressed
+      Mimic_Dance_116: RT(2s) + A.on_pressed
+      Mimic_Dance_117: RT(2s) + B.on_pressed
+      Mimic_Dance_118: RT(2s) + X.on_pressed
+      Mimic_Dance_119: RT(2s) + Y.on_pressed
     policy_dir: ../../policy/g1_29/velocity_v2
   Mimic_Dance_101:
     transitions: 
@@ -264,5 +279,41 @@ FSM:
     fps: 30
     motion_file: ../../policy/g1_29/mocap/pult.csv
     policy_dir: ../../policy/g1_29/mimic/pult
+    time_start: 0
+    time_end: 60
+  Mimic_Dance_116:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 30
+    motion_file: ../../policy/g1_29/mocap/mixer.csv
+    policy_dir: ../../policy/g1_29/mimic/mixer
+    time_start: 0
+    time_end: 60
+  Mimic_Dance_117:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 30
+    motion_file: ../../policy/g1_29/mocap/piano_n_cap.csv
+    policy_dir: ../../policy/g1_29/mimic/piano_n_cap
+    time_start: 0
+    time_end: 60
+  Mimic_Dance_118:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 30
+    motion_file: ../../policy/g1_29/mocap/important.csv
+    policy_dir: ../../policy/g1_29/mimic/important
+    time_start: 0
+    time_end: 60
+  Mimic_Dance_119:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 30
+    motion_file: ../../policy/g1_29/mocap/important2.csv
+    policy_dir: ../../policy/g1_29/mimic/important2
     time_start: 0
     time_end: 60
