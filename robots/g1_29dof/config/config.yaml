@@ -65,12 +65,12 @@ FSM:
     Mimic_Dance_117:
       id: 117
       type: Mimic
-    # Mimic_Dance_118:
-    #   id: 118
-    #   type: Mimic
-    # Mimic_Dance_119:
-    #   id: 119
-    #   type: Mimic
+    Mimic_Dance_118:
+      id: 118
+      type: Mimic
+    Mimic_Dance_119:
+      id: 119
+      type: Mimic
 
   Passive:
     transitions: 
@@ -307,7 +307,7 @@ FSM:
     motion_file: ../../policy/g1_29/mocap/important.csv
     policy_dir: ../../policy/g1_29/mimic/important
     time_start: 0
-    time_end: 60
+    time_end: 80
   Mimic_Dance_119:
     transitions: 
       Passive: LT + B.on_pressed
@@ -316,4 +316,4 @@ FSM:
     motion_file: ../../policy/g1_29/mocap/important2.csv
     policy_dir: ../../policy/g1_29/mimic/important2
     time_start: 0
-    time_end: 60
+    time_end: 80
