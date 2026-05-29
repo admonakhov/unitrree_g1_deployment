@@ -71,9 +71,9 @@ FSM:
     Mimic_Dance_119:
       id: 119
       type: Mimic
-    # Mimic_Dance_120:
-    #   id: 120
-    #   type: Mimic
+    Mimic_Dance_120:
+      id: 120
+      type: Mimic
     Mimic_Dance_121:
       id: 121
       type: Mimic

@@ -2,7 +2,7 @@ import requests
 from config import URL
 
 payload = {
-    "state": "Mimic_Dance_124"
+    "state": "Mimic_Dance_120"
 }
 
 headers = {
