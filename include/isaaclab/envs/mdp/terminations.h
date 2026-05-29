@@ -7,7 +7,7 @@ namespace isaaclab
 namespace mdp
 {
 
-inline bool bad_orientation(ManagerBasedRLEnv* env, float limit_angle = 1.5)
+inline bool bad_orientation(ManagerBasedRLEnv* env, float limit_angle = 1)
 {
     auto & asset = env->robot;
     auto & data = asset->data.projected_gravity_b;
