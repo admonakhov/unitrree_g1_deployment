@@ -71,6 +71,22 @@ FSM:
     Mimic_Dance_119:
       id: 119
       type: Mimic
+    # Mimic_Dance_120:
+    #   id: 120
+    #   type: Mimic
+    Mimic_Dance_121:
+      id: 121
+      type: Mimic
+    Mimic_Dance_122:
+      id: 122
+      type: Mimic
+    Mimic_Dance_123:
+      id: 123
+      type: Mimic
+    Mimic_Dance_124:
+      id: 124
+      type: Mimic
+
 
   Passive:
     transitions: 
@@ -139,6 +155,11 @@ FSM:
       Mimic_Dance_117: RT(2s) + B.on_pressed
       Mimic_Dance_118: RT(2s) + X.on_pressed
       Mimic_Dance_119: RT(2s) + Y.on_pressed
+      Mimic_Dance_120: RT(2s) + Y.on_pressed
+      Mimic_Dance_121: RT(2s) + Y.on_pressed
+      Mimic_Dance_122: RT(2s) + Y.on_pressed
+      Mimic_Dance_123: RT(2s) + Y.on_pressed
+      Mimic_Dance_124: RT(2s) + Y.on_pressed
     policy_dir: ../../policy/g1_29/velocity_v2
   Mimic_Dance_101:
     transitions: 
@@ -315,5 +336,50 @@ FSM:
     fps: 30
     motion_file: ../../policy/g1_29/mocap/important2.csv
     policy_dir: ../../policy/g1_29/mimic/important2
+    time_start: 0
+    time_end: 80
+  Mimic_Dance_120:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 30
+    motion_file: ../../policy/g1_29/mocap/IMG_1845.csv
+    policy_dir: ../../policy/g1_29/mimic/IMG_1845
+    time_start: 0
+    time_end: 80
+  Mimic_Dance_121:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 30
+    motion_file: ../../policy/g1_29/mocap/IMG_1847.csv
+    policy_dir: ../../policy/g1_29/mimic/IMG_1847
+    time_start: 0
+    time_end: 80
+  Mimic_Dance_122:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 30
+    motion_file: ../../policy/g1_29/mocap/IMG_1851.csv
+    policy_dir: ../../policy/g1_29/mimic/IMG_1851
+    time_start: 0
+    time_end: 80
+  Mimic_Dance_123:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 30
+    motion_file: ../../policy/g1_29/mocap/IMG_1853.csv
+    policy_dir: ../../policy/g1_29/mimic/IMG_1853
+    time_start: 0
+    time_end: 80
+  Mimic_Dance_124:
+    transitions: 
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 30
+    motion_file: ../../policy/g1_29/mocap/IMG_1855.csv
+    policy_dir: ../../policy/g1_29/mimic/IMG_1855
     time_start: 0
     time_end: 80
