@@ -88,6 +88,9 @@ FSM:
       type: Mimic
 
 
+    Mimic_154:
+      id: 125
+      type: Mimic
   Passive:
     transitions: 
       FixStand: LT + up.on_pressed
@@ -160,6 +163,7 @@ FSM:
       Mimic_Dance_122: RT(2s) + Y.on_pressed
       Mimic_Dance_123: RT(2s) + Y.on_pressed
       Mimic_Dance_124: RT(2s) + Y.on_pressed
+      Mimic_154: "!back"
     policy_dir: ../../policy/g1_29/velocity_v2
   Mimic_Dance_101:
     transitions: 
@@ -383,3 +387,12 @@ FSM:
     policy_dir: ../../policy/g1_29/mimic/IMG_1855
     time_start: 0
     time_end: 80
+  Mimic_154:
+    transitions:
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 30
+    motion_file: ../../policy/g1_29/mocap/vooji.csv
+    policy_dir: ../../policy/g1_29/mimic/vooji
+    time_start: 0.0
+    time_end: 60.0
