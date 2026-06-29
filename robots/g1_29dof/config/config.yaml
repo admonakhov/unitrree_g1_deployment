@@ -163,7 +163,7 @@ FSM:
       Mimic_Dance_122: RT(2s) + Y.on_pressed
       Mimic_Dance_123: RT(2s) + Y.on_pressed
       Mimic_Dance_124: RT(2s) + Y.on_pressed
-      Mimic_154: "!back"
+      Mimic_154: RT(2s) + Y.on_pressed
     policy_dir: ../../policy/g1_29/velocity_v2
   Mimic_Dance_101:
     transitions: 
@@ -393,6 +393,6 @@ FSM:
       Velocity: RB + X.on_pressed
     fps: 30
     motion_file: ../../policy/g1_29/mocap/vooji.csv
-    policy_dir: ../../policy/g1_29/mimic/vooji
+    policy_dir: ../../policy/g1_29/mimic/Mimic_154
     time_start: 0.0
     time_end: 60.0
