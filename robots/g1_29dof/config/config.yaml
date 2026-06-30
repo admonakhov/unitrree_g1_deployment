@@ -100,6 +100,9 @@ FSM:
     Mimic_160:
       id: 128
       type: Mimic
+    Mimic_161:
+      id: 129
+      type: Mimic
   Passive:
     transitions: 
       FixStand: LT + up.on_pressed
@@ -176,6 +179,7 @@ FSM:
       Mimic_155: RT(2s) + Y.on_pressed
       Mimic_156: RT(2s) + Y.on_pressed
       Mimic_160: RT(2s) + Y.on_pressed
+      Mimic_161: RT(2s) + Y.on_pressed
     policy_dir: ../../policy/g1_29/velocity_v2
   Mimic_Dance_101:
     transitions: 
@@ -433,5 +437,14 @@ FSM:
     fps: 30
     motion_file: ../../policy/g1_29/mocap/Mimic_160.csv
     policy_dir: ../../policy/g1_29/mimic/Mimic_160
+    time_start: 0.0
+    time_end: 60.0
+  Mimic_161:
+    transitions:
+      Passive: LT + B.on_pressed
+      Velocity: RB + X.on_pressed
+    fps: 30
+    motion_file: ../../policy/g1_29/mocap/Mimic_161.csv
+    policy_dir: ../../policy/g1_29/mimic/Mimic_161
     time_start: 0.0
     time_end: 60.0
