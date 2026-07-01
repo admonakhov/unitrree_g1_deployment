@@ -13,7 +13,7 @@ neptune_project: isaaclab
 wandb_project: isaaclab
 resume: true
 load_run: .*
-load_checkpoint: /tmp/gofactory-input-2779460638.pt
+load_checkpoint: /tmp/gofactory-input-3011002935.pt
 class_name: OnPolicyRunner
 policy:
   class_name: ActorCritic
