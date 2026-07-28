@@ -16,6 +16,9 @@
 ### Сборка unitree_sdk2
 
 ```bash
+
+sudo apt install -y libyaml-cpp-dev libboost-all-dev libeigen3-dev libspdlog-dev libfmt-dev
+
 cd deploy/thirdparty/unitree_sdk2
 mkdir build && cd build
 cmake .. -DBUILD_EXAMPLES=OFF # Install on the /usr/local directory
@@ -68,3 +71,4 @@ cd robots/g1_29dof/build
 3. Переведите робота в рабочие состояния с пульта:
    - `L2 + Up` для перехода в `FixStand`
    - `R1 + X` для перехода в `Velocity`
+   - `L2 + B` для перехода в `Passive`
