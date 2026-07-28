@@ -16,7 +16,7 @@
 ### Сборка unitree_sdk2
 
 ```bash
-cd unitree_sdk2
+cd deploy/thirdparty/unitree_sdk2
 mkdir build && cd build
 cmake .. -DBUILD_EXAMPLES=OFF # Install on the /usr/local directory
 sudo make install
