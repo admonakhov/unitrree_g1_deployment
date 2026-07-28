@@ -39,12 +39,6 @@ cmake .. -DUSE_ONNXRUNTIME_AARCH64=ON
 make
 ```
 
-```bash
-cd robots/a1_23dof/build
-cmake .. -DUSE_ONNXRUNTIME_AARCH64=ON
-make
-```
-
 ## Использование для деплоя
 
 Ниже приведён базовый порядок запуска контроллера и подачи команд скорости.
