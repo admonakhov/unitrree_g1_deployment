@@ -65,7 +65,6 @@ cd robots/g1_29dof/build
 Для запуска с внешненго ПК необходимо указать используемый интерфейс:
 
 ```bash
-screen -S g1_ctrl
 cd robots/g1_29dof/build
 ./g1_ctrl -n eth0
 ```
