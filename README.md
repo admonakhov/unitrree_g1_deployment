@@ -13,6 +13,15 @@
 
 ## Примеры сборки
 
+### Сборка unitree_sdk2
+
+```bash
+cd unitree_sdk2
+mkdir build && cd build
+cmake .. -DBUILD_EXAMPLES=OFF # Install on the /usr/local directory
+sudo make install
+```
+
 ### Сборка x64
 
 ```bash
