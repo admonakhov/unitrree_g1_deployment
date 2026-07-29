@@ -3,14 +3,12 @@
 #include <array>
 #include <atomic>
 #include <chrono>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
 
 #include <yaml-cpp/yaml.h>
-
-#include <rclcpp/rclcpp.hpp>
-#include <geometry_msgs/msg/twist.hpp>
 
 class CmdVelBridge
 {
@@ -19,6 +17,7 @@ public:
 
     CmdVelBridge(const CmdVelBridge&) = delete;
     CmdVelBridge& operator=(const CmdVelBridge&) = delete;
+    ~CmdVelBridge();
 
     void start(const std::string& node_name = "g1_29dof_cmd_vel_bridge",
                const std::string& topic_name = "/cmd_vel");
@@ -28,7 +27,9 @@ public:
                                  double timeout_sec = 0.5) const;
 
 private:
-    CmdVelBridge() = default;
+    struct Impl;
+
+    CmdVelBridge();
 
     static int64_t steady_now_ns();
 
@@ -39,8 +40,5 @@ private:
     std::atomic<bool> started_{false};
 
     mutable std::mutex ros_mutex_;
-    rclcpp::Node::SharedPtr node_;
-    rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr sub_;
-    std::shared_ptr<rclcpp::executors::SingleThreadedExecutor> executor_;
-    std::thread spin_thread_;
+    std::unique_ptr<Impl> impl_;
 };

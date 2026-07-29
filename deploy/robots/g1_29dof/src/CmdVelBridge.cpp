@@ -4,11 +4,29 @@
 #include <iostream>
 #include <stdexcept>
 
+#include <geometry_msgs/msg/twist.hpp>
+#include <rclcpp/rclcpp.hpp>
+
+struct CmdVelBridge::Impl
+{
+    rclcpp::Node::SharedPtr node;
+    rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr sub;
+    std::shared_ptr<rclcpp::executors::SingleThreadedExecutor> executor;
+    std::thread spin_thread;
+};
+
 CmdVelBridge& CmdVelBridge::instance()
 {
     static CmdVelBridge bridge;
     return bridge;
 }
+
+CmdVelBridge::CmdVelBridge()
+: impl_(std::make_unique<Impl>())
+{
+}
+
+CmdVelBridge::~CmdVelBridge() = default;
 
 int64_t CmdVelBridge::steady_now_ns()
 {
@@ -31,8 +49,8 @@ void CmdVelBridge::start(const std::string& node_name, const std::string& topic_
         rclcpp::init(argc, argv);
     }
 
-    node_ = std::make_shared<rclcpp::Node>(node_name);
-    sub_ = node_->create_subscription<geometry_msgs::msg::Twist>(
+    impl_->node = std::make_shared<rclcpp::Node>(node_name);
+    impl_->sub = impl_->node->create_subscription<geometry_msgs::msg::Twist>(
         topic_name,
         rclcpp::SensorDataQoS(),
         [this](const geometry_msgs::msg::Twist::SharedPtr msg) {
@@ -42,11 +60,11 @@ void CmdVelBridge::start(const std::string& node_name, const std::string& topic_
             last_msg_ns_.store(steady_now_ns(), std::memory_order_release);
         });
 
-    executor_ = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
-    executor_->add_node(node_);
-    spin_thread_ = std::thread([this]() {
+    impl_->executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
+    impl_->executor->add_node(impl_->node);
+    impl_->spin_thread = std::thread([this]() {
         try {
-            executor_->spin();
+            impl_->executor->spin();
         } catch (const std::exception& e) {
             std::cerr << "ROS2 /cmd_vel bridge executor stopped: " << e.what() << std::endl;
         }
@@ -64,18 +82,18 @@ void CmdVelBridge::stop()
 
     std::lock_guard<std::mutex> lock(ros_mutex_);
 
-    if (executor_) {
-        executor_->cancel();
+    if (impl_->executor) {
+        impl_->executor->cancel();
     }
-    if (spin_thread_.joinable()) {
-        spin_thread_.join();
+    if (impl_->spin_thread.joinable()) {
+        impl_->spin_thread.join();
     }
-    if (executor_ && node_) {
-        executor_->remove_node(node_);
+    if (impl_->executor && impl_->node) {
+        impl_->executor->remove_node(impl_->node);
     }
-    sub_.reset();
-    node_.reset();
-    executor_.reset();
+    impl_->sub.reset();
+    impl_->node.reset();
+    impl_->executor.reset();
 
     if (rclcpp::ok()) {
         rclcpp::shutdown();

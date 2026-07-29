@@ -43,6 +43,7 @@ link_libraries(
 file(GLOB_RECURSE ADD_SRC_LIST
   ${PROJECT_SOURCE_DIR}/src/*.cpp
 )
+list(REMOVE_ITEM ADD_SRC_LIST ${PROJECT_SOURCE_DIR}/src/CmdVelBridge.cpp)
 
 add_library(${PROJECT_NAME}_lib ${ADD_SRC_LIST})
 target_include_directories(${PROJECT_NAME}_lib BEFORE PRIVATE
@@ -55,8 +56,11 @@ target_compile_options(${PROJECT_NAME}_lib PRIVATE
   -I${UNITREE_SDK_PREFIX}/include/ddscxx
   -I${UNITREE_SDK_PREFIX}/include/iceoryx/v2.0.2
 )
-ament_target_dependencies(${PROJECT_NAME}_lib rclcpp geometry_msgs)
-link_libraries(${PROJECT_NAME}_lib)
+add_library(${PROJECT_NAME}_cmd_vel_bridge src/CmdVelBridge.cpp)
+target_include_directories(${PROJECT_NAME}_cmd_vel_bridge PRIVATE
+  include
+)
+ament_target_dependencies(${PROJECT_NAME}_cmd_vel_bridge rclcpp geometry_msgs)
 
 add_executable(g1_ctrl main.cpp)
 target_include_directories(g1_ctrl BEFORE PRIVATE
@@ -69,4 +73,4 @@ target_compile_options(g1_ctrl PRIVATE
   -I${UNITREE_SDK_PREFIX}/include/ddscxx
   -I${UNITREE_SDK_PREFIX}/include/iceoryx/v2.0.2
 )
-ament_target_dependencies(g1_ctrl rclcpp geometry_msgs)
+target_link_libraries(g1_ctrl PRIVATE ${PROJECT_NAME}_lib ${PROJECT_NAME}_cmd_vel_bridge)
