@@ -1,0 +1,12 @@
+.git
+**/build
+**/CMakeFiles
+**/CMakeCache.txt
+**/cmake_install.cmake
+**/Makefile
+**/*.o
+**/*.o.d
+**/log
+**/logs
+**/__pycache__
+**/.pytest_cache

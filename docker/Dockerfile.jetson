@@ -1,0 +1,60 @@
+# syntax=docker/dockerfile:1
+
+# Default is multi-arch ROS2 Humble on Ubuntu 22.04. On Jetson Orin you can
+# override this with an L4T/Humble image if your platform requires it:
+#   --build-arg BASE_IMAGE=<your-jetson-humble-base>
+ARG BASE_IMAGE=ros:humble-ros-base-jammy
+FROM ${BASE_IMAGE}
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    ROS_DISTRO=humble \
+    G1_PROJECT_DIR=/workspace/g1-cart-delivery
+
+SHELL ["/bin/bash", "-c"]
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      bash \
+      build-essential \
+      ca-certificates \
+      cmake \
+      git \
+      iproute2 \
+      libboost-all-dev \
+      libeigen3-dev \
+      libfmt-dev \
+      libspdlog-dev \
+      libyaml-cpp-dev \
+      net-tools \
+      python3 \
+      ros-humble-geometry-msgs \
+      ros-humble-rclcpp \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR ${G1_PROJECT_DIR}
+COPY . ${G1_PROJECT_DIR}
+
+# Install Unitree SDK2 and its bundled CycloneDDS libraries for the container arch.
+RUN cmake -S deploy/thirdparty/unitree_sdk2 \
+          -B /tmp/unitree_sdk2_build \
+          -DBUILD_EXAMPLES=OFF \
+          -DCMAKE_BUILD_TYPE=Release \
+    && cmake --build /tmp/unitree_sdk2_build -j"$(nproc)" \
+    && cmake --install /tmp/unitree_sdk2_build \
+    && rm -rf /tmp/unitree_sdk2_build
+
+# Build the G1 controller for Jetson/ARM64. The aarch64 ONNX Runtime bundle is
+# already vendored under deploy/thirdparty/onnxruntime-linux-aarch64-1.23.2.
+RUN source /opt/ros/humble/setup.bash \
+    && cmake -S deploy/robots/g1_29dof \
+             -B deploy/robots/g1_29dof/build \
+             -DUSE_ONNXRUNTIME_AARCH64=ON \
+             -DCMAKE_BUILD_TYPE=Release \
+    && cmake --build deploy/robots/g1_29dof/build -j"$(nproc)"
+
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENV LD_LIBRARY_PATH=/usr/local/lib:${G1_PROJECT_DIR}/deploy/thirdparty/onnxruntime-linux-aarch64-1.23.2/lib:${LD_LIBRARY_PATH}
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["bash"]
