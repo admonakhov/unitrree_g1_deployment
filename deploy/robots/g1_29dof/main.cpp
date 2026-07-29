@@ -3,6 +3,7 @@
 #include "FSM/State_FixStand.h"
 #include "FSM/State_RLBase.h"
 #include "State_Mimic.h"
+#include "CmdVelBridge.h"
 
 std::unique_ptr<LowCmd_t> FSMState::lowcmd = nullptr;
 std::shared_ptr<LowState_t> FSMState::lowstate = nullptr;
@@ -38,6 +39,8 @@ int main(int argc, char** argv)
 
     init_fsm_state();
 
+    CmdVelBridge::instance().start();
+
     FSMState::lowcmd->msg_.mode_machine() = 5; // 29dof
     if(!FSMState::lowcmd->check_mode_machine(FSMState::lowstate)) {
         spdlog::critical("Unmatched robot type.");
@@ -50,6 +53,7 @@ int main(int argc, char** argv)
 
     std::cout << "Press [L2 + Up] to enter FixStand mode.\n";
     std::cout << "And then press [R1 + X] to start controlling the robot.\n";
+    std::cout << "Velocity commands are read from ROS2 topic /cmd_vel (geometry_msgs/msg/Twist).\n";
 
     while (true)
     {

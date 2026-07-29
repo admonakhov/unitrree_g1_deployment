@@ -27,6 +27,7 @@ sudo make install
 
 ```bash
 cd robots/g1_29dof/build
+source /opt/ros/humble/setup.bash
 cmake ..
 make
 ```
@@ -35,9 +36,12 @@ make
 
 ```bash
 cd robots/g1_29dof/build
+source /opt/ros/humble/setup.bash
 cmake .. -DUSE_ONNXRUNTIME_AARCH64=ON
 make
 ```
+
+Контроллер теперь линкуется с ROS2 `rclcpp` и `geometry_msgs`, поэтому перед `cmake` и перед запуском нужно source-ить ROS2 окружение.
 
 ## Использование для деплоя
 
@@ -45,14 +49,25 @@ make
 
 ```bash
 cd robots/g1_29dof/build
+source /opt/ros/humble/setup.bash
 ./g1_ctrl
 ```
+
+В состоянии `Velocity` команда скорости берётся из ROS2 топика `/cmd_vel` типа `geometry_msgs/msg/Twist`:
+
+```bash
+ros2 topic pub /cmd_vel geometry_msgs/msg/Twist \
+  "{linear: {x: 0.2, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}" -r 10
+```
+
+Используются поля `linear.x`, `linear.y`, `angular.z`. Они ограничиваются диапазонами из `deploy/robots/g1_29dof/config/policy/velocity/v0/params/deploy.yaml` (`lin_vel_x`, `lin_vel_y`, `ang_vel_z`). Если `/cmd_vel` не приходит дольше 0.5 секунды, команда автоматически становится `[0, 0, 0]`.
 
 Чтобы деплой не закрывался при закрытии терминала используйте screen:
 
 ```bash
 screen -S g1_ctrl
 cd robots/g1_29dof/build
+source /opt/ros/humble/setup.bash
 ./g1_ctrl
 ```
 
@@ -60,6 +75,7 @@ cd robots/g1_29dof/build
 
 ```bash
 cd robots/g1_29dof/build
+source /opt/ros/humble/setup.bash
 ./g1_ctrl -n eth0
 ```
 

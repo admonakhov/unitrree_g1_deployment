@@ -1,4 +1,5 @@
 #include "FSM/State_RLBase.h"
+#include "CmdVelBridge.h"
 #include "unitree_articulation.h"
 #include "isaaclab/envs/mdp/observations/observations.h"
 #include "isaaclab/envs/mdp/actions/joint_actions.h"
@@ -28,6 +29,13 @@ REGISTER_OBSERVATION(keyboard_velocity_commands)
         cmd = key_commands[key];
     }
     return cmd;
+}
+
+REGISTER_OBSERVATION(ros2_velocity_commands)
+{
+    static auto cfg = env->cfg["commands"]["base_velocity"]["ranges"];
+    const auto cmd = CmdVelBridge::instance().command(cfg);
+    return std::vector<float>{cmd[0], cmd[1], cmd[2]};
 }
 
 }

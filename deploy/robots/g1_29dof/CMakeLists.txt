@@ -15,6 +15,9 @@ endif()
 
 find_package(Boost REQUIRED COMPONENTS program_options)
 find_package(yaml-cpp REQUIRED)
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(geometry_msgs REQUIRED)
 
 include_directories(
   /usr/include/eigen3
@@ -36,6 +39,8 @@ file(GLOB_RECURSE ADD_SRC_LIST
 )
 
 add_library(${PROJECT_NAME}_lib ${ADD_SRC_LIST})
+ament_target_dependencies(${PROJECT_NAME}_lib rclcpp geometry_msgs)
 link_libraries(${PROJECT_NAME}_lib)
 
 add_executable(g1_ctrl main.cpp)
+ament_target_dependencies(g1_ctrl rclcpp geometry_msgs)
