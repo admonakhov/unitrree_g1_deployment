@@ -49,6 +49,7 @@ RUN cmake -S deploy/thirdparty/unitree_sdk2 \
 RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
     && cmake -S deploy/robots/g1_29dof \
              -B deploy/robots/g1_29dof/build \
+             -DUNITREE_SDK_PREFIX=/usr/local \
              -DUSE_ONNXRUNTIME_AARCH64=ON \
              -DCMAKE_BUILD_TYPE=Release \
     && cmake --build deploy/robots/g1_29dof/build -j"$(nproc)"

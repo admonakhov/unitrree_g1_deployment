@@ -121,6 +121,17 @@ make
 
 Контроллер линкуется с ROS2 `rclcpp` и `geometry_msgs`, поэтому перед `cmake` и перед запуском нужно source-ить ROS2 окружение.
 
+Если при сборке в ROS2 Foxy появляется ошибка из `/usr/local/include/ddscxx/...` вида `DDS_DATA_REPRESENTATION_FLAG_XCDR1 was not declared`, `dds_create_topic_sertype was not declared` или `getSerType is not a member`, это конфликт заголовков CycloneDDS из Unitree SDK2 и ROS2. Пересоберите контроллер с чистым build-каталогом, чтобы CMake применил приоритет `/usr/local/include` для Unitree SDK2:
+
+```bash
+rm -rf deploy/robots/g1_29dof/build
+mkdir -p deploy/robots/g1_29dof/build
+cd deploy/robots/g1_29dof/build
+source /opt/ros/${ROS_DISTRO}/setup.bash
+cmake .. -DUNITREE_SDK_PREFIX=/usr/local -DUSE_ONNXRUNTIME_AARCH64=ON
+make -j$(nproc)
+```
+
 ## Использование для деплоя
 
 Ниже приведён базовый порядок запуска контроллера и подачи команд скорости.
