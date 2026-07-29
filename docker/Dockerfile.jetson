@@ -1,13 +1,15 @@
 # syntax=docker/dockerfile:1
 
-# Default is multi-arch ROS2 Humble on Ubuntu 22.04. On Jetson Orin you can
-# override this with an L4T/Humble image if your platform requires it:
-#   --build-arg BASE_IMAGE=<your-jetson-humble-base>
-ARG BASE_IMAGE=ros:humble-ros-base-jammy
+# Jetson Orin deployments commonly run JetPack 5 / Ubuntu 20.04, so the
+# default ROS2 distro here is Foxy. Humble remains supported by overriding both
+# args, e.g. ROS_DISTRO=humble BASE_IMAGE=ros:humble-ros-base-jammy.
+ARG ROS_DISTRO=foxy
+ARG BASE_IMAGE=ros:foxy-ros-base-focal
 FROM ${BASE_IMAGE}
 
+ARG ROS_DISTRO=foxy
 ENV DEBIAN_FRONTEND=noninteractive \
-    ROS_DISTRO=humble \
+    ROS_DISTRO=${ROS_DISTRO} \
     G1_PROJECT_DIR=/workspace/g1-cart-delivery
 
 SHELL ["/bin/bash", "-c"]
@@ -26,8 +28,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       libyaml-cpp-dev \
       net-tools \
       python3 \
-      ros-humble-geometry-msgs \
-      ros-humble-rclcpp \
+      ros-${ROS_DISTRO}-geometry-msgs \
+      ros-${ROS_DISTRO}-rclcpp \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR ${G1_PROJECT_DIR}
@@ -44,7 +46,7 @@ RUN cmake -S deploy/thirdparty/unitree_sdk2 \
 
 # Build the G1 controller for Jetson/ARM64. The aarch64 ONNX Runtime bundle is
 # already vendored under deploy/thirdparty/onnxruntime-linux-aarch64-1.23.2.
-RUN source /opt/ros/humble/setup.bash \
+RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
     && cmake -S deploy/robots/g1_29dof \
              -B deploy/robots/g1_29dof/build \
              -DUSE_ONNXRUNTIME_AARCH64=ON \

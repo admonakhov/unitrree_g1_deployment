@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-IMAGE=${IMAGE:-g1-cart-delivery:humble-aarch64}
+ROS_DISTRO=${ROS_DISTRO:-foxy}
+IMAGE=${IMAGE:-g1-cart-delivery:${ROS_DISTRO}-aarch64}
 NETWORK_IFACE=${NETWORK_IFACE:-eth0}
 CONTAINER_NAME=${CONTAINER_NAME:-g1-cart-delivery}
 
@@ -15,4 +16,4 @@ docker run --rm -it \
   --ulimit memlock=-1 \
   --cap-add SYS_NICE \
   "${IMAGE}" \
-  bash -lc "cd deploy/robots/g1_29dof/build && ./g1_ctrl -n ${NETWORK_IFACE}"
+  bash -lc "source /opt/ros/${ROS_DISTRO}/setup.bash && cd deploy/robots/g1_29dof/build && ./g1_ctrl -n ${NETWORK_IFACE}"

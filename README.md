@@ -2,18 +2,24 @@
 
 В этом репозитории поддерживается выбор пакета ONNX Runtime во время конфигурации CMake для запуска с внешнего или локального ПК.
 
-## Поддерживаемый флаг
+## Поддерживаемые ROS2 дистрибутивы
+
+- Docker deploy на Jetson Orin/aarch64 по умолчанию использует ROS2 Foxy (`ros:foxy-ros-base-focal`). Это соответствует JetPack 5 / Ubuntu 20.04 сценариям.
+- ROS2 Humble тоже поддерживается через переменную `ROS_DISTRO=humble` и base image `ros:humble-ros-base-jammy`.
+- C++ bridge `/cmd_vel` использует только стабильные API `rclcpp` + `geometry_msgs/msg/Twist`, совместимые с Foxy и Humble.
+
+## Поддерживаемый флаг ONNX Runtime
 
 - `USE_ONNXRUNTIME_AARCH64`
-  - По умолчанию `OFF`
-  - Когда `OFF`, сборка использует `thirdparty/onnxruntime-linux-x64-1.22.0` для запуска на x64 архитектуре (внешние ПК).
+  - По умолчанию `OFF`.
+  - Когда `OFF`, сборка использует `thirdparty/onnxruntime-linux-x64-1.22.0` для запуска на x64 архитектуре.
   - Когда `ON`, сборка использует `thirdparty/onnxruntime-linux-aarch64-1.23.2` для запуска на ARM64/aarch64, например Jetson Orin.
 
-## Docker deploy на Jetson Orin (aarch64, ROS2 Humble)
+## Docker deploy на Jetson Orin (aarch64, ROS2 Foxy по умолчанию)
 
-Целевой способ деплоя: запускать контроллер из Docker-контейнера на Jetson Orin/aarch64 с ROS2 Humble. Dockerfile устанавливает зависимости из README, собирает `unitree_sdk2`, затем собирает `g1_ctrl` с `-DUSE_ONNXRUNTIME_AARCH64=ON`.
+Целевой способ деплоя: запускать контроллер из Docker-контейнера на Jetson Orin/aarch64. Dockerfile устанавливает зависимости из README, собирает `unitree_sdk2`, затем собирает `g1_ctrl` с `-DUSE_ONNXRUNTIME_AARCH64=ON`.
 
-### Сборка образа на Jetson
+### Сборка ROS2 Foxy образа на Jetson
 
 ```bash
 cd /path/to/g1-cart-delivery
@@ -22,25 +28,47 @@ docker/build_jetson.sh
 
 По умолчанию используется:
 
-- image: `g1-cart-delivery:humble-aarch64`
+- `ROS_DISTRO=foxy`
+- image: `g1-cart-delivery:foxy-aarch64`
 - platform: `linux/arm64`
-- base image: `ros:humble-ros-base-jammy`
+- base image: `ros:foxy-ros-base-focal`
 
-Если на Jetson нужен свой L4T/ROS Humble base image, переопределите его:
+Если нужен свой L4T/Foxy base image:
 
 ```bash
-BASE_IMAGE=<your-jetson-humble-base> docker/build_jetson.sh
+BASE_IMAGE=<your-jetson-foxy-base> docker/build_jetson.sh
+```
+
+### Сборка ROS2 Humble образа, если нужен Humble
+
+```bash
+ROS_DISTRO=humble docker/build_jetson.sh
+```
+
+или явно:
+
+```bash
+ROS_DISTRO=humble BASE_IMAGE=ros:humble-ros-base-jammy docker/build_jetson.sh
 ```
 
 ### Запуск контроллера из контейнера
+
+Для Foxy по умолчанию:
 
 ```bash
 NETWORK_IFACE=eth0 docker/run_jetson.sh
 ```
 
+Для Humble:
+
+```bash
+ROS_DISTRO=humble NETWORK_IFACE=eth0 docker/run_jetson.sh
+```
+
 Скрипт запускает контейнер с `--network host`, чтобы ROS2/DDS discovery и Unitree DDS работали через сетевой интерфейс Jetson. Внутри контейнера выполняется:
 
 ```bash
+source /opt/ros/${ROS_DISTRO}/setup.bash
 cd deploy/robots/g1_29dof/build
 ./g1_ctrl -n eth0
 ```
@@ -51,7 +79,7 @@ cd deploy/robots/g1_29dof/build
 NETWORK_IFACE=enP8p1s0 docker/run_jetson.sh
 ```
 
-Публикация команды скорости, например из другого ROS2 Humble терминала/контейнера в той же host network:
+Публикация команды скорости, например из другого ROS2 Foxy/Humble терминала или контейнера в той же host network:
 
 ```bash
 ros2 topic pub /cmd_vel geometry_msgs/msg/Twist \
@@ -74,8 +102,9 @@ sudo make install
 ### Сборка x64
 
 ```bash
+export ROS_DISTRO=foxy  # или humble
 cd deploy/robots/g1_29dof/build
-source /opt/ros/humble/setup.bash
+source /opt/ros/${ROS_DISTRO}/setup.bash
 cmake ..
 make
 ```
@@ -83,8 +112,9 @@ make
 ### Сборка aarch64
 
 ```bash
+export ROS_DISTRO=foxy  # или humble
 cd deploy/robots/g1_29dof/build
-source /opt/ros/humble/setup.bash
+source /opt/ros/${ROS_DISTRO}/setup.bash
 cmake .. -DUSE_ONNXRUNTIME_AARCH64=ON
 make
 ```
@@ -96,8 +126,9 @@ make
 Ниже приведён базовый порядок запуска контроллера и подачи команд скорости.
 
 ```bash
+export ROS_DISTRO=foxy  # или humble
 cd deploy/robots/g1_29dof/build
-source /opt/ros/humble/setup.bash
+source /opt/ros/${ROS_DISTRO}/setup.bash
 ./g1_ctrl
 ```
 
@@ -109,16 +140,18 @@ source /opt/ros/humble/setup.bash
 
 ```bash
 screen -S g1_ctrl
+export ROS_DISTRO=foxy  # или humble
 cd deploy/robots/g1_29dof/build
-source /opt/ros/humble/setup.bash
+source /opt/ros/${ROS_DISTRO}/setup.bash
 ./g1_ctrl
 ```
 
 Для запуска с внешнего ПК необходимо указать используемый интерфейс:
 
 ```bash
+export ROS_DISTRO=foxy  # или humble
 cd deploy/robots/g1_29dof/build
-source /opt/ros/humble/setup.bash
+source /opt/ros/${ROS_DISTRO}/setup.bash
 ./g1_ctrl -n eth0
 ```
 
