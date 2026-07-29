@@ -1,6 +1,8 @@
 #include "CmdVelBridge.h"
 
 #include <algorithm>
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <stdexcept>
 
@@ -43,34 +45,49 @@ void CmdVelBridge::start(const std::string& node_name, const std::string& topic_
 
     std::lock_guard<std::mutex> lock(ros_mutex_);
 
-    if (!rclcpp::ok()) {
-        int argc = 0;
-        char** argv = nullptr;
-        rclcpp::init(argc, argv);
+    const char* rmw = std::getenv("RMW_IMPLEMENTATION");
+    if (!rmw || std::strcmp(rmw, "rmw_cyclonedds_cpp") == 0) {
+        setenv("RMW_IMPLEMENTATION", "rmw_fastrtps_cpp", 1);
+        std::cout << "ROS2 cmd_vel bridge: using RMW_IMPLEMENTATION=rmw_fastrtps_cpp "
+                  << "to avoid CycloneDDS conflict with Unitree SDK2" << std::endl;
     }
 
-    impl_->node = std::make_shared<rclcpp::Node>(node_name);
-    impl_->sub = impl_->node->create_subscription<geometry_msgs::msg::Twist>(
-        topic_name,
-        rclcpp::SensorDataQoS(),
-        [this](const geometry_msgs::msg::Twist::SharedPtr msg) {
-            lin_x_.store(static_cast<float>(msg->linear.x), std::memory_order_relaxed);
-            lin_y_.store(static_cast<float>(msg->linear.y), std::memory_order_relaxed);
-            ang_z_.store(static_cast<float>(msg->angular.z), std::memory_order_relaxed);
-            last_msg_ns_.store(steady_now_ns(), std::memory_order_release);
+    try {
+        if (!rclcpp::ok()) {
+            int argc = 0;
+            char** argv = nullptr;
+            rclcpp::init(argc, argv);
+        }
+
+        impl_->node = std::make_shared<rclcpp::Node>(node_name);
+        impl_->sub = impl_->node->create_subscription<geometry_msgs::msg::Twist>(
+            topic_name,
+            rclcpp::SensorDataQoS(),
+            [this](const geometry_msgs::msg::Twist::SharedPtr msg) {
+                lin_x_.store(static_cast<float>(msg->linear.x), std::memory_order_relaxed);
+                lin_y_.store(static_cast<float>(msg->linear.y), std::memory_order_relaxed);
+                ang_z_.store(static_cast<float>(msg->angular.z), std::memory_order_relaxed);
+                last_msg_ns_.store(steady_now_ns(), std::memory_order_release);
+            });
+
+        impl_->executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
+        impl_->executor->add_node(impl_->node);
+        impl_->spin_thread = std::thread([this]() {
+            try {
+                impl_->executor->spin();
+            } catch (const std::exception& e) {
+                std::cerr << "ROS2 /cmd_vel bridge executor stopped: " << e.what() << std::endl;
+            }
         });
 
-    impl_->executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
-    impl_->executor->add_node(impl_->node);
-    impl_->spin_thread = std::thread([this]() {
-        try {
-            impl_->executor->spin();
-        } catch (const std::exception& e) {
-            std::cerr << "ROS2 /cmd_vel bridge executor stopped: " << e.what() << std::endl;
-        }
-    });
-
-    std::cout << "ROS2 cmd_vel bridge started: subscribing to " << topic_name << std::endl;
+        std::cout << "ROS2 cmd_vel bridge started: subscribing to " << topic_name << std::endl;
+    } catch (const std::exception& e) {
+        impl_->sub.reset();
+        impl_->node.reset();
+        impl_->executor.reset();
+        started_.store(false, std::memory_order_release);
+        std::cerr << "ROS2 /cmd_vel bridge disabled: " << e.what() << std::endl;
+    }
 }
 
 void CmdVelBridge::stop()

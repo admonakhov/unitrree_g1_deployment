@@ -42,7 +42,7 @@ std::array<float, 3> gamepad_velocity_command(const YAML::Node& ranges)
     return {
         scale_axis(joystick.ly(), ranges, "lin_vel_x"),
         scale_axis(joystick.lx(), ranges, "lin_vel_y"),
-        scale_axis(joystick.rx(), ranges, "ang_vel_z")
+        scale_axis(-joystick.rx(), ranges, "ang_vel_z")
     };
 }
 }
