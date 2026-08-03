@@ -34,16 +34,11 @@ find_library(UNITREE_SDK2_LIB unitree_sdk2 PATHS ${UNITREE_SDK_PREFIX}/lib NO_DE
 find_library(UNITREE_DDSC_LIB ddsc PATHS ${UNITREE_SDK_PREFIX}/lib NO_DEFAULT_PATH REQUIRED)
 find_library(UNITREE_DDSCXX_LIB ddscxx PATHS ${UNITREE_SDK_PREFIX}/lib NO_DEFAULT_PATH REQUIRED)
 
-link_libraries(
-  ${UNITREE_SDK2_LIB} ${UNITREE_DDSC_LIB} ${UNITREE_DDSCXX_LIB} rt pthread # dds
-  libboost_program_options.a libyaml-cpp.a fmt
-  ${ONNXRUNTIME_LIB}
-)
-
 file(GLOB_RECURSE ADD_SRC_LIST
   ${PROJECT_SOURCE_DIR}/src/*.cpp
 )
 list(REMOVE_ITEM ADD_SRC_LIST ${PROJECT_SOURCE_DIR}/src/CmdVelBridge.cpp)
+list(REMOVE_ITEM ADD_SRC_LIST ${PROJECT_SOURCE_DIR}/src/CmdVelBridgeNode.cpp)
 
 add_library(${PROJECT_NAME}_lib ${ADD_SRC_LIST})
 target_include_directories(${PROJECT_NAME}_lib BEFORE PRIVATE
@@ -56,11 +51,20 @@ target_compile_options(${PROJECT_NAME}_lib PRIVATE
   -I${UNITREE_SDK_PREFIX}/include/ddscxx
   -I${UNITREE_SDK_PREFIX}/include/iceoryx/v2.0.2
 )
+target_link_libraries(${PROJECT_NAME}_lib PUBLIC
+  ${UNITREE_SDK2_LIB} ${UNITREE_DDSC_LIB} ${UNITREE_DDSCXX_LIB} rt pthread
+  libboost_program_options.a libyaml-cpp.a fmt
+  ${ONNXRUNTIME_LIB}
+)
+
 add_library(${PROJECT_NAME}_cmd_vel_bridge src/CmdVelBridge.cpp)
 target_include_directories(${PROJECT_NAME}_cmd_vel_bridge PRIVATE
   include
 )
-ament_target_dependencies(${PROJECT_NAME}_cmd_vel_bridge rclcpp geometry_msgs)
+target_link_libraries(${PROJECT_NAME}_cmd_vel_bridge PUBLIC pthread)
+
+add_executable(g1_cmd_vel_bridge_node src/CmdVelBridgeNode.cpp)
+ament_target_dependencies(g1_cmd_vel_bridge_node rclcpp geometry_msgs)
 
 add_executable(g1_ctrl main.cpp)
 target_include_directories(g1_ctrl BEFORE PRIVATE
