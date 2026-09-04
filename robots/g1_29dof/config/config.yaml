@@ -79,8 +79,9 @@ FSM:
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
     fps: 60
-    motion_file: ../../policy/g1_29/mocap/pushup.csv
-    policy_dir: ../../policy/g1_29/mimic/pushup
+    motion_file: ../../policy/g1_29/mocap/jumping_jack.csv
+    policy_dir: ../../policy/g1_29/mimic/jumping_jack
+
     time_start: 0
     time_end: 25
     
@@ -89,8 +90,8 @@ FSM:
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
     fps: 60
-    motion_file: ../../policy/g1_29/mocap/jumping_jack.csv
-    policy_dir: ../../policy/g1_29/mimic/jumping_jack
+    motion_file: ../../policy/g1_29/mocap/pushup.csv
+    policy_dir: ../../policy/g1_29/mimic/pushup
     time_start: 0
     time_end: 25
     check_bad_orientation: false
