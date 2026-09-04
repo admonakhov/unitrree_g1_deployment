@@ -154,12 +154,18 @@ State_Mimic::State_Mimic(int state_mode, std::string state_string)
             FSMStringMap.right.at("Velocity")
         )
     );
-    this->registered_checks.emplace_back(
-        std::make_pair(
-            [&]()->bool{ return isaaclab::mdp::bad_orientation(env.get(), 1.3); }, // bad orientation
-            FSMStringMap.right.at("Passive")
-        )
-    );
+    bool check_bad_orientation = true;
+    if (cfg["check_bad_orientation"]) {
+        check_bad_orientation = cfg["check_bad_orientation"].as<bool>();
+    }
+    if (check_bad_orientation) {
+        this->registered_checks.emplace_back(
+            std::make_pair(
+                [&]()->bool{ return isaaclab::mdp::bad_orientation(env.get(), 1.3); },
+                FSMStringMap.right.at("Passive")
+            )
+        );
+    }
 }
 
 void State_Mimic::enter()
