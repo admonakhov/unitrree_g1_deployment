@@ -79,8 +79,8 @@ FSM:
       Passive: LT + B.on_pressed
       Velocity: RB + X.on_pressed
     fps: 60
-    motion_file: ../../policy/g1_29/mocap/jumping_jack.csv
-    policy_dir: ../../policy/g1_29/mimic/jumping_jack
+    motion_file: ../../policy/g1_29/mocap/jumping_jack_short.csv
+    policy_dir: ../../policy/g1_29/mimic/jumping_jack_short
 
     time_start: 0
     time_end: 25
